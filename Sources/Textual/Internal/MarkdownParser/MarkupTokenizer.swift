@@ -82,7 +82,7 @@ extension MarkupTokenizer {
 
 extension MarkupTokenizer.Pattern {
   static var emoji: Self {
-    .init(regex: /:([a-zA-Z0-9_+-]+):/, tokenType: .emoji)
+    .init(regex: #/:([a-zA-Z0-9_+-]+):/#, tokenType: .emoji)
   }
 }
 
