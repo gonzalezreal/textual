@@ -45,7 +45,13 @@ bundle-prism:
 	@echo "Bundling Prism.js..."
 	./Scripts/bundle-prism.sh
 
-.PHONY: format test bundle-prism
+build-demo:
+	@echo "Building TextualDemo for iOS..."
+	xcodebuild build -workspace Textual.xcworkspace -scheme TextualDemo -destination platform="$(PLATFORM_IOS)"
+	@echo "Building TextualDemo for macOS..."
+	xcodebuild build -workspace Textual.xcworkspace -scheme TextualDemo -destination platform="$(PLATFORM_MACOS)"
+
+.PHONY: format test bundle-prism build-demo
 
 define udid_for
 $(shell xcrun simctl list devices available '$(1)' | grep '$(2)' | sort -r | head -1 | awk -F '[()]' '{ print $$(NF-3) }')
