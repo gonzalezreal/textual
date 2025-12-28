@@ -221,21 +221,23 @@ extension AnyFontProvider {
           base: baseProvider, modifier: LeadingFontModifier(leading: leading)
         )
       )
-    case "ModifierProvider<ScalePointSizeModifier>":
-      guard
-        #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *),
-        let modifierMirror = mirror.descendant("modifier").map(Mirror.init(reflecting:)),
-        let scaleFactor = modifierMirror.descendant("scaleFactor") as? CGFloat,
-        let base = mirror.descendant("base", "provider", "base"),
-        let baseProvider = AnyFontProvider(reflecting: base)
-      else {
-        return nil
-      }
-      self.init(
-        FontModifierProvider(
-          base: baseProvider, modifier: ScaleFontModifier(scaleFactor: scaleFactor)
+    #if compiler(>=6.2)
+      case "ModifierProvider<ScalePointSizeModifier>":
+        guard
+          #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *),
+          let modifierMirror = mirror.descendant("modifier").map(Mirror.init(reflecting:)),
+          let scaleFactor = modifierMirror.descendant("scaleFactor") as? CGFloat,
+          let base = mirror.descendant("base", "provider", "base"),
+          let baseProvider = AnyFontProvider(reflecting: base)
+        else {
+          return nil
+        }
+        self.init(
+          FontModifierProvider(
+            base: baseProvider, modifier: ScaleFontModifier(scaleFactor: scaleFactor)
+          )
         )
-      )
+    #endif
     default:
       return nil
     }
