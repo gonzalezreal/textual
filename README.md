@@ -1,6 +1,7 @@
 # Textual
-<!-- TODO: CI badge -->
-<!-- TODO: SPI badges -->
+[![CI](https://github.com/gonzalezreal/textual/workflows/CI/badge.svg)](https://github.com/gonzalezreal/textual/actions?query=workflow%3ACI)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fgonzalezreal%2Ftextual%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/gonzalezreal/textual)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fgonzalezreal%2Ftextual%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/gonzalezreal/textual)
 
 Render and customize rich attributed text in SwiftUI.
 

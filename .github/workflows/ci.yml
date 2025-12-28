@@ -4,9 +4,25 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE*'
+      - '.gitignore'
+      - '.editorconfig'
+      - '**.gif'
+      - '**.png'
+      - '**.jpg'
   pull_request:
     branches:
       - '*'
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE*'
+      - '.gitignore'
+      - '.editorconfig'
+      - '**.gif'
+      - '**.png'
+      - '**.jpg'
   workflow_dispatch:
 
 concurrency:
