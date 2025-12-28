@@ -51,6 +51,9 @@ build-demo:
 	@echo "Building TextualDemo for macOS..."
 	xcodebuild build -workspace Textual.xcworkspace -scheme TextualDemo -destination platform="$(PLATFORM_MACOS)" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 
+test-swift-5:
+  swift test  -Xswiftc -swift-version -Xswiftc 5
+
 .PHONY: format test bundle-prism build-demo
 
 define udid_for
