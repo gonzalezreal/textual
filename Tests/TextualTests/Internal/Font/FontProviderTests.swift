@@ -112,50 +112,52 @@ struct FontProviderTests {
     #expect(resolvedFont == .system(size: 17 * scale).bold().monospaced())
   }
 
-  @available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *)
-  @Test func textStyleScaledByResolve() {
-    // given
-    let font = Font.body
-      .scaled(by: 2)
-      .bold()
-      .monospaced()
-      .scaled(by: 3)
-    let fontProvider = AnyFontProvider(font: font)
-    let environment = TextEnvironmentValues(dynamicTypeSize: .xxxLarge)
+  #if compiler(>=6.2)
+    @available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *)
+    @Test func textStyleScaledByResolve() {
+      // given
+      let font = Font.body
+        .scaled(by: 2)
+        .bold()
+        .monospaced()
+        .scaled(by: 3)
+      let fontProvider = AnyFontProvider(font: font)
+      let environment = TextEnvironmentValues(dynamicTypeSize: .xxxLarge)
 
-    let fontDescriptor = FontDescriptor.preferredFontDescriptor(
-      withTextStyle: .body,
-      in: environment
-    )
+      let fontDescriptor = FontDescriptor.preferredFontDescriptor(
+        withTextStyle: .body,
+        in: environment
+      )
 
-    // when
-    let size = fontProvider?.size(in: environment)
-    let resolvedFont = fontProvider?.resolve(in: environment)
+      // when
+      let size = fontProvider?.size(in: environment)
+      let resolvedFont = fontProvider?.resolve(in: environment)
 
-    // then
-    #expect(size == fontDescriptor.pointSize * 2 * 3)
-    #expect(resolvedFont == font)
-  }
+      // then
+      #expect(size == fontDescriptor.pointSize * 2 * 3)
+      #expect(resolvedFont == font)
+    }
 
-  @available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *)
-  @Test func systemFontScaledByResolve() {
-    // given
-    let scale = CGFloat(0.8)
-    let font = Font.system(size: 17)
-      .bold()
-      .scaled(by: scale)
-      .monospaced()
+    @available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *)
+    @Test func systemFontScaledByResolve() {
+      // given
+      let scale = CGFloat(0.8)
+      let font = Font.system(size: 17)
+        .bold()
+        .scaled(by: scale)
+        .monospaced()
 
-    let fontProvider = AnyFontProvider(font: font)
+      let fontProvider = AnyFontProvider(font: font)
 
-    // when
-    let size = fontProvider?.size(in: .init())
-    let resolvedFont = fontProvider?.resolve(in: .init())
+      // when
+      let size = fontProvider?.size(in: .init())
+      let resolvedFont = fontProvider?.resolve(in: .init())
 
-    // then
-    #expect(size == 17 * scale)
-    #expect(resolvedFont == font)
-  }
+      // then
+      #expect(size == 17 * scale)
+      #expect(resolvedFont == font)
+    }
+  #endif
 
   #if canImport(UIKit)
     @Test func customFontRelativeToTextStyleScale() {

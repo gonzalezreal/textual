@@ -226,10 +226,14 @@ struct TextPropertyTests {
 
 extension Font {
   fileprivate static func system(size: CGFloat, scale: CGFloat) -> Font {
-    if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
-      .system(size: size).scaled(by: scale)
-    } else {
+    #if compiler(>=6.2)
+      if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
+        .system(size: size).scaled(by: scale)
+      } else {
+        .system(size: size * scale)
+      }
+    #else
       .system(size: size * scale)
-    }
+    #endif
   }
 }
