@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Discussion
+    url: https://github.com/gonzalezreal/textual/discussions
+    about: Textual Q&A, ideas, and feature requests
+  - name: Documentation
+    url: https://github.com/gonzalezreal/textual#readme
+    about: Read documentation and examples for Textual
