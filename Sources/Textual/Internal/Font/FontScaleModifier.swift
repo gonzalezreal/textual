@@ -21,11 +21,15 @@ struct FontScaleModifier: ViewModifier {
   }
 
   func body(content: Content) -> some View {
-    if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
-      content.font(font.scaled(by: scale))
-    } else {
+    #if compiler(>=6.2)
+      if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
+        content.font(font.scaled(by: scale))
+      } else {
+        content.font(modifiedFont())
+      }
+    #else
       content.font(modifiedFont())
-    }
+    #endif
   }
 
   private func modifiedFont() -> Font {

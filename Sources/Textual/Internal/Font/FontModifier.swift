@@ -35,20 +35,22 @@ struct LeadingFontModifier: FontModifier {
   }
 }
 
-@available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *)
-struct ScaleFontModifier: FontModifier {
-  var scaleFactor: CGFloat
+#if compiler(>=6.2)
+  @available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *)
+  struct ScaleFontModifier: FontModifier {
+    var scaleFactor: CGFloat
 
-  func modify(_ font: inout Font) {
-    font = font.scaled(by: scaleFactor)
-  }
+    func modify(_ font: inout Font) {
+      font = font.scaled(by: scaleFactor)
+    }
 
-  // NB: Modify both font and size so that measurements match rendering.
-  //     FontProvider.size(in:) must return the actual rendered size.
-  func modify(_ size: inout CGFloat) {
-    size *= scaleFactor
+    // NB: Modify both font and size so that measurements match rendering.
+    //     FontProvider.size(in:) must return the actual rendered size.
+    func modify(_ size: inout CGFloat) {
+      size *= scaleFactor
+    }
   }
-}
+#endif
 
 // MARK: - Static font modifiers
 
