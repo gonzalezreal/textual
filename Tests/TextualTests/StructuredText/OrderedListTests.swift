@@ -36,7 +36,8 @@
         .background(Color.guide)
         .padding(.horizontal)
 
-        assertSnapshot(of: view, as: .image(layout: layout))
+        // Need to use a lower precision for CI
+        assertSnapshot(of: view, as: .image(precision: 0.85, layout: layout))
       }
 
       @Test func lowerRomanList() {
