@@ -8,6 +8,7 @@ Render and customize rich attributed text in SwiftUI.
 - [Overview](#overview)
 - [Getting Started](#getting-started)
 - [Demos](#demos)
+- [Documentation](#documentation)
 - [Installation](#installation)
 - [License](#license)
 
@@ -286,6 +287,10 @@ to explore and reference.
 
 The demo lives in [`Examples/TextualDemo`](./Examples/TextualDemo) and is included in `Textual.xcworkspace` at the
 repository root. Open the workspace to browse the library source and run the demo side-by-side.
+
+## Documentation
+
+The latest documentation for Textual is available [here](https://swiftpackageindex.com/gonzalezreal/textual/main/documentation/textual).
 
 ## Installation
 
