@@ -39,9 +39,8 @@ let package = Package(
         .product(name: "SnapshotTesting", package: "swift-snapshot-testing"),
       ],
       exclude: [
-        "Internal/MarkdownParser/__Snapshots__",
-        "Internal/TextInteraction/__Snapshots__",
         "StructuredText/__Snapshots__",
+        "Internal/MarkdownParser/__Snapshots__",
       ],
       resources: [.copy("Fixtures")],
       swiftSettings: [
