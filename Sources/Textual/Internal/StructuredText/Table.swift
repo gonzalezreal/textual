@@ -35,7 +35,7 @@ extension StructuredText {
         layout: tableLayout
       )
       let resolvedStyle = tableStyle.resolve(configuration: configuration)
-        .onPreferenceChange(TableCell.SpacingKey.self) {
+        .onPreferenceChange(TableCell.SpacingKey.self) { @MainActor in
           spacing = $0
         }
 
