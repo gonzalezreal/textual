@@ -63,5 +63,6 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 
-# Claude Code
+# Agents
 CLAUDE.md
+AGENTS.md
