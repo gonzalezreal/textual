@@ -39,7 +39,7 @@ format:
 		--in-place \
 		--parallel \
 		--recursive \
-		./Package.swift ./Package@swift-6.0.swift ./Sources ./Tests ./Examples
+		./Package.swift ./Sources ./Tests ./Examples
 
 bundle-prism:
 	@echo "Bundling Prism.js..."
