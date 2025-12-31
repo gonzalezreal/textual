@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-  name: "Textual",
+  name: "textual",
   platforms: [
     .macOS(.v15),
     .iOS(.v18),
@@ -48,6 +48,5 @@ let package = Package(
         .define("TEXTUAL_ENABLE_TEXT_SELECTION", .when(platforms: [.macOS, .iOS, .visionOS]))
       ]
     ),
-  ],
-  swiftLanguageModes: [.v6]
+  ]
 )
