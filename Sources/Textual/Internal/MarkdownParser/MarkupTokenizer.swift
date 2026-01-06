@@ -84,6 +84,14 @@ extension MarkupTokenizer.Pattern {
   static var emoji: Self {
     .init(regex: /:([a-zA-Z0-9_+-]+):/, tokenType: .emoji)
   }
+
+  static var mathBlock: Self {
+    .init(regex: /(?s)\$\$(.+?)\$\$/, tokenType: .mathBlock)
+  }
+
+  static var mathInline: Self {
+    .init(regex: /\$(?!\$)((?:\\\$|[^$\n])+)\$/, tokenType: .mathInline)
+  }
 }
 
 extension MarkupTokenizer {
@@ -111,4 +119,6 @@ extension MarkupTokenizer {
 extension MarkupTokenizer.TokenType {
   static let markup: Self = "markup"
   static let emoji: Self = "emoji"
+  static let mathBlock: Self = "mathBlock"
+  static let mathInline: Self = "mathInline"
 }

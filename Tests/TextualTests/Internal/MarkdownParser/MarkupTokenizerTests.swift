@@ -144,4 +144,77 @@ struct MarkupTokenizerTests {
       ]
     )
   }
+
+  @Test func inlineMath() throws {
+    // given
+    let markupTokenizer = MarkupTokenizer(patterns: [.mathBlock, .mathInline])
+
+    // when
+    let tokens = try markupTokenizer.tokenize("Euler: $e^{i\\pi}+1=0$.")
+
+    // then
+    #expect(
+      tokens == [
+        .init(type: .markup, content: "Euler: "),
+        .init(type: .mathInline, content: "$e^{i\\pi}+1=0$", capturedContent: "e^{i\\pi}+1=0"),
+        .init(type: .markup, content: "."),
+      ]
+    )
+  }
+
+  @Test func inlineMathEscapedDollar() throws {
+    // given
+    let markupTokenizer = MarkupTokenizer(patterns: [.mathBlock, .mathInline])
+
+    // when
+    let tokens = try markupTokenizer.tokenize("Cost: $a\\$b$")
+
+    // then
+    #expect(
+      tokens == [
+        .init(type: .markup, content: "Cost: "),
+        .init(type: .mathInline, content: "$a\\$b$", capturedContent: "a\\$b"),
+      ]
+    )
+  }
+
+  @Test func blockMath() throws {
+    // given
+    let markupTokenizer = MarkupTokenizer(patterns: [.mathBlock, .mathInline])
+
+    // when
+    let tokens = try markupTokenizer.tokenize(
+      """
+      Before
+      $$
+      E = mc^2
+      $$
+      After
+      """
+    )
+
+    // then
+    #expect(
+      tokens == [
+        .init(type: .markup, content: "Before\n"),
+        .init(type: .mathBlock, content: "$$\nE = mc^2\n$$", capturedContent: "\nE = mc^2\n"),
+        .init(type: .markup, content: "\nAfter"),
+      ]
+    )
+  }
+
+  @Test func blockMathPreferredOverInline() throws {
+    // given
+    let markupTokenizer = MarkupTokenizer(patterns: [.mathBlock, .mathInline])
+
+    // when
+    let tokens = try markupTokenizer.tokenize("$$x+1$$")
+
+    // then
+    #expect(
+      tokens == [
+        .init(type: .mathBlock, content: "$$x+1$$", capturedContent: "x+1")
+      ]
+    )
+  }
 }
