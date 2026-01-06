@@ -41,7 +41,7 @@ import SwiftUI
 /// Images are decoded using the system image codecs. Supported formats typically include JPEG and
 /// PNG, animated GIF and APNG, WebP, and HEIC/HEICS.
 ///
-/// Custom emoji can be defined and substituted during preprocessing:
+/// Custom emoji can be defined and substituted during pattern expansion:
 ///
 /// ```swift
 /// let emoji: Set<Emoji> = [
@@ -57,7 +57,7 @@ import SwiftUI
 ///
 /// InlineText(
 ///   markdown: "Even when the build fails :confused_dog:, a quick refactor helps :doge:.",
-///   preprocessingOptions: .init(emoji: emoji)
+///   patternOptions: .init(emoji: emoji)
 /// )
 /// ```
 ///
@@ -126,18 +126,17 @@ extension InlineText {
   ///   - baseURL: The base URL to use when resolving Markdown URLs. The initializer treats URLs as
   ///     being relative to this URL. If this value is `nil`, the initializer doesn’t resolve URLs.
   ///     The default is `nil`.
-  ///   - preprocessingOptions: Options for preprocessing the markdown before parsing. This can
-  ///     include custom emoji substitution.
+  ///   - patternOptions: Options for pattern substitution after markdown parsing.
   public init(
     markdown: String,
     baseURL: URL? = nil,
-    preprocessingOptions: AttributedStringMarkdownParser.PreprocessingOptions = .init()
+    patternOptions: AttributedStringMarkdownParser.PatternOptions = .init()
   ) {
     self.init(
       markdown,
       parser: .inlineMarkdown(
         baseURL: baseURL,
-        preprocessingOptions: preprocessingOptions
+        patternOptions: patternOptions
       )
     )
   }
@@ -156,7 +155,7 @@ extension InlineText {
         and when it doesn’t, I just roll with it :dogroll: until the solution finally \
         clicks (though sometimes I still end up a bit :sad_dog:).
         """,
-      preprocessingOptions: .init(emoji: .previewEmoji)
+      patternOptions: .init(emoji: .previewEmoji)
     )
     .padding()
   }

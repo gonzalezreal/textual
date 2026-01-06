@@ -1,9 +1,9 @@
 import Foundation
 
-/// A custom emoji definition used during Markdown preprocessing.
+/// A custom emoji definition used during pattern expansion after Markdown parsing.
 ///
 /// You can pass a set of `Emoji` values in
-/// ``AttributedStringMarkdownParser/PreprocessingOptions`` to expand
+/// ``AttributedStringMarkdownParser/PatternOptions`` to expand
 /// `:shortcode:` sequences into inline attachments.
 public struct Emoji: Hashable, Sendable, Codable {
   /// The shortcode used in the markup, without surrounding `:` characters.

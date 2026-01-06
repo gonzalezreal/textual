@@ -25,7 +25,7 @@ struct InlineTextDemo: View {
             and when it doesn’t, I just roll with it :dogroll: until the solution finally \
             clicks (though sometimes I still end up a bit :sad_dog:).
             """,
-          preprocessingOptions: .init(emoji: .mastoEmoji)
+          patternOptions: .init(emoji: .mastoEmoji)
         )
       }
       Section("Custom Inline Style") {

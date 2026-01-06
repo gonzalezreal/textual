@@ -49,7 +49,7 @@ struct CodeBlockDemo: View {
             At this point, the code behaves, the build is quiet, and you decide not to push your luck.
             Tomorrow is another walk.
             """,
-          preprocessingOptions: .init(emoji: .mastoEmoji)
+          patternOptions: .init(emoji: .mastoEmoji)
         )
         .textual.textSelection(.enabled)
         .textual.overflowMode(self.wrapCode ? .wrap : .scroll)

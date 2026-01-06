@@ -31,7 +31,7 @@ struct ListDemo: View {
 
             In all cases, remember to commit early and often.
             """,
-          preprocessingOptions: .init(emoji: .mastoEmoji)
+          patternOptions: .init(emoji: .mastoEmoji)
         )
       }
       .textual.textSelection(.enabled)

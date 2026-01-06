@@ -6,7 +6,7 @@ import SwiftUI
 //
 // Markup parsing keeps some items as URL attributes:
 // - `run.imageURL` for images
-// - `run.textual.emojiURL` for custom emoji references emitted by preprocessing
+// - `run.textual.emojiURL` for custom emoji references emitted by pattern expansion
 //
 // This view asynchronously loads those URLs using the environment-provided attachment loaders and
 // writes the resolved attachments back into the attributed string as `Textual.Attachment`

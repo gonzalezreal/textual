@@ -2,17 +2,17 @@ import Foundation
 
 // MARK: - Overview
 //
-// `MarkupTokenizer` scans markup source text and splits it into tokens based on a small set of
+// `PatternTokenizer` scans source text and splits it into tokens based on a small set of
 // regex patterns.
 //
-// It’s designed for preprocessing steps that need to rewrite specific constructs (like emoji
+// It’s designed for postprocessing steps that need to rewrite specific constructs (like emoji
 // shortcodes) while leaving everything else untouched. Each pattern is applied as a prefix match
 // at the current cursor position, which keeps the tokenizer simple and predictable.
 //
 // This tokenizer is intentionally conservative: patterns are opt-in and processing is linear. If
-// no patterns are provided, the input is returned as a single `.markup` token.
+// no patterns are provided, the input is returned as a single `.text` token.
 
-struct MarkupTokenizer {
+struct PatternTokenizer {
   private let patterns: [Pattern]
 
   init(patterns: [Pattern]) {
@@ -21,7 +21,7 @@ struct MarkupTokenizer {
 
   func tokenize(_ input: String) throws -> [Token] {
     guard !patterns.isEmpty else {
-      return [.init(type: .markup, content: input)]
+      return [.init(type: .text, content: input)]
     }
 
     var tokens: [Token] = []
@@ -36,10 +36,10 @@ struct MarkupTokenizer {
           continue
         }
 
-        // Add any markup before the match
+        // Add any text before the match
         if currentIndex < match.range.lowerBound {
           let markup = String(input[currentIndex..<match.range.lowerBound])
-          tokens.append(.init(type: .markup, content: markup))
+          tokens.append(.init(type: .text, content: markup))
         }
 
         tokens.append(
@@ -56,14 +56,14 @@ struct MarkupTokenizer {
       }
 
       if !matchFound {
-        // Append or create markup
+        // Append or create text
         let nextIndex = input.index(after: currentIndex)
         let content = String(input[currentIndex])
 
-        if let last = tokens.indices.last, tokens[last].type == .markup {
+        if let last = tokens.indices.last, tokens[last].type == .text {
           tokens[last].content += content
         } else {
-          tokens.append(.init(type: .markup, content: content))
+          tokens.append(.init(type: .text, content: content))
         }
         currentIndex = nextIndex
       }
@@ -73,14 +73,14 @@ struct MarkupTokenizer {
   }
 }
 
-extension MarkupTokenizer {
+extension PatternTokenizer {
   struct Pattern {
     let regex: Regex<(Substring, Substring)>
     let tokenType: TokenType
   }
 }
 
-extension MarkupTokenizer.Pattern {
+extension PatternTokenizer.Pattern {
   static var emoji: Self {
     .init(regex: /:([a-zA-Z0-9_+-]+):/, tokenType: .emoji)
   }
@@ -94,7 +94,7 @@ extension MarkupTokenizer.Pattern {
   }
 }
 
-extension MarkupTokenizer {
+extension PatternTokenizer {
   struct Token: Hashable, Sendable {
     let type: TokenType
     var content: String
@@ -102,7 +102,7 @@ extension MarkupTokenizer {
   }
 }
 
-extension MarkupTokenizer {
+extension PatternTokenizer {
   struct TokenType: Hashable, RawRepresentable, Sendable, ExpressibleByStringLiteral {
     public let rawValue: String
 
@@ -116,8 +116,8 @@ extension MarkupTokenizer {
   }
 }
 
-extension MarkupTokenizer.TokenType {
-  static let markup: Self = "markup"
+extension PatternTokenizer.TokenType {
+  static let text: Self = "text"
   static let emoji: Self = "emoji"
   static let mathBlock: Self = "mathBlock"
   static let mathInline: Self = "mathInline"

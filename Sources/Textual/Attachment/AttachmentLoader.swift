@@ -35,7 +35,7 @@ import SwiftUI
 ///
 /// StructuredText(
 ///   markdown: "![Alt text](sad_dog) :sad_dog:",
-///   preprocessingOptions: .init(emoji: emoji)
+///   patternOptions: .init(emoji: emoji)
 /// )
 /// .textual.imageAttachmentLoader(.image(named: \.lastPathComponent))
 /// .textual.emojiAttachmentLoader(.emoji(named: \.lastPathComponent))

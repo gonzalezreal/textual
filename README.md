@@ -126,7 +126,7 @@ let emoji: Set<Emoji> = [
 
 InlineText(
   markdown: "Shipped the new feature :rocket: and it's working :sparkles:",
-  preprocessingOptions: .init(emoji: emoji)
+  patternOptions: .init(emoji: emoji)
 )
 ```
 

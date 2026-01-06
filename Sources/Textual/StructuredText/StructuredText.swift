@@ -149,18 +149,17 @@ extension StructuredText {
   /// - Parameters:
   ///   - markdown: The Markdown source to render.
   ///   - baseURL: A base URL used to resolve relative links and image URLs.
-  ///   - preprocessingOptions: Options applied before Markdown parsing (for example, emoji
-  ///     substitution).
+  ///   - patternOptions: Options for pattern substitution after markdown parsing.
   public init(
     markdown: String,
     baseURL: URL? = nil,
-    preprocessingOptions: AttributedStringMarkdownParser.PreprocessingOptions = .init()
+    patternOptions: AttributedStringMarkdownParser.PatternOptions = .init()
   ) {
     self.init(
       markdown,
       parser: .markdown(
         baseURL: baseURL,
-        preprocessingOptions: preprocessingOptions
+        patternOptions: patternOptions
       )
     )
   }
@@ -221,7 +220,7 @@ extension StructuredText {
         You can substitute shortcodes with inline images. For example, :dog: and :cat: render \
         as small inline attachments that flow with the surrounding text.
         """,
-      preprocessingOptions: .init(emoji: emoji)
+      patternOptions: .init(emoji: emoji)
     )
     .padding()
   }
