@@ -13,16 +13,9 @@ extension AttributeScopes {
     ///
     /// Textual uses this attribute as an intermediate representation before resolving emoji into
     /// an attachment.
-    public enum EmojiURLAttribute:
-      CodableAttributedStringKey,
-      MarkdownDecodableAttributedStringKey
-    {
+    public enum EmojiURLAttribute: AttributedStringKey {
       public typealias Value = URL
       public static let name = "Textual.EmojiURL"
-
-      public static func decodeMarkdown(from decoder: any Decoder) throws -> URL {
-        try decoder.singleValueContainer().decode(URL.self)
-      }
     }
 
     /// A property for accessing an attachment attribute.
