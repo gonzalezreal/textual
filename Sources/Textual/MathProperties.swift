@@ -4,25 +4,25 @@ private import SwiftUIMath
 public struct MathProperties: Sendable, Hashable {
   public struct FontName: Hashable, Sendable, RawRepresentable, ExpressibleByStringLiteral {
     public let rawValue: String
-    
+
     public init(rawValue: String) {
       self.rawValue = rawValue
     }
-    
+
     public init(stringLiteral value: StringLiteralType) {
       self.rawValue = value
     }
   }
-  
+
   public var fontName: FontName
-  
+
   public var fontScale: CGFloat
-  
+
   public init(fontName: FontName, fontScale: CGFloat) {
     self.fontName = fontName
     self.fontScale = fontScale
   }
-  
+
   public static let `default` = MathProperties(fontName: .latinModern, fontScale: 1.0)
 }
 

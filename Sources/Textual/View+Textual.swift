@@ -96,7 +96,7 @@ extension TextualNamespace where Base: View {
   public func emojiProperties(_ emojiProperties: EmojiProperties) -> some View {
     base.environment(\.emojiProperties, emojiProperties)
   }
-  
+
   public func mathProperties(_ mathProperties: MathProperties) -> some View {
     base.environment(\.mathProperties, mathProperties)
   }
