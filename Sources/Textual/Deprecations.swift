@@ -2,6 +2,11 @@ import SwiftUI
 
 // MARK: - Deprecated after 0.1.1
 
+extension AttachmentSelectionStyle {
+  @available(*, deprecated, renamed: "text")
+  public static let inline: AttachmentSelectionStyle = .text
+}
+
 extension InlineText {
   @available(*, deprecated, renamed: "init(markdown:baseURL:patternOptions:)")
   @_disfavoredOverload

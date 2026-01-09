@@ -1,12 +1,12 @@
 import SwiftUI
 
 /// Determines how text selection affects an attachment.
-public enum AttachmentSelectionStyle {
-  /// Treats the attachment as inline content.
+public enum AttachmentSelectionStyle: Sendable {
+  /// Treats the attachment as inline text.
   ///
   /// Use this for glyph-like attachments (for example, custom emoji) that should not be dimmed
   /// when selected.
-  case inline
+  case text
 
   /// Treats the attachment as an embedded object.
   ///

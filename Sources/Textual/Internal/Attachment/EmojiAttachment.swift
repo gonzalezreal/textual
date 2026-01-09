@@ -9,7 +9,7 @@ struct EmojiAttachment: Attachment {
 
   @usableFromInline
   var selectionStyle: AttachmentSelectionStyle {
-    .inline
+    .text
   }
 
   private let image: Image

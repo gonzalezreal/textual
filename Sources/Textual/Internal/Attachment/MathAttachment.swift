@@ -6,7 +6,7 @@ struct MathAttachment: Attachment {
     case inline
     case block
   }
-  
+
   var description: String {
     switch style {
     case .inline:
@@ -15,31 +15,31 @@ struct MathAttachment: Attachment {
       return "$$\(latex)$$"
     }
   }
-  
+
   var selectionStyle: AttachmentSelectionStyle {
-    .inline
+    .text
   }
-  
+
   private let latex: String
   private let style: Style
-  
+
   init(latex: String, style: Style) {
     self.latex = latex
     self.style = style
   }
-  
+
   var body: some View {
     MathView(latex: latex, style: style)
   }
-  
+
   func baselineOffset(in environment: TextEnvironmentValues) -> CGFloat {
     -typographicBounds(in: environment).descent
   }
-  
+
   func sizeThatFits(_ proposal: ProposedViewSize, in environment: TextEnvironmentValues) -> CGSize {
     typographicBounds(fitting: proposal, in: environment).size
   }
-  
+
   private func typographicBounds(
     fitting proposal: ProposedViewSize = .unspecified,
     in environment: TextEnvironmentValues
@@ -58,10 +58,10 @@ struct MathAttachment: Attachment {
 
 private struct MathView: View {
   @Environment(\.textEnvironment) private var environment
-  
+
   let latex: String
   let style: MathAttachment.Style
-  
+
   var body: some View {
     Math(latex)
       .mathFont(
