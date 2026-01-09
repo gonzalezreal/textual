@@ -17,12 +17,14 @@ let package = Package(
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-concurrency-extras", from: "1.3.1"),
     .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.7"),
+    .package(url: "https://github.com/gonzalezreal/swiftui-math", branch: "swiftui-refactoring"),
   ],
   targets: [
     .target(
       name: "Textual",
       dependencies: [
-        .product(name: "ConcurrencyExtras", package: "swift-concurrency-extras")
+        .product(name: "ConcurrencyExtras", package: "swift-concurrency-extras"),
+        .product(name: "SwiftUIMath", package: "swiftui-math"),
       ],
       resources: [
         .process("Internal/Highlighter/Prism")
@@ -39,7 +41,6 @@ let package = Package(
         .product(name: "SnapshotTesting", package: "swift-snapshot-testing"),
       ],
       exclude: [
-        "Internal/MarkdownParser/__Snapshots__",
         "Internal/TextInteraction/__Snapshots__",
         "StructuredText/__Snapshots__",
       ],

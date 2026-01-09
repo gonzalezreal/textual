@@ -96,6 +96,10 @@ extension TextualNamespace where Base: View {
   public func emojiProperties(_ emojiProperties: EmojiProperties) -> some View {
     base.environment(\.emojiProperties, emojiProperties)
   }
+  
+  public func mathProperties(_ mathProperties: MathProperties) -> some View {
+    base.environment(\.mathProperties, mathProperties)
+  }
 
   /// Scales the font used within the view by a constant factor.
   @MainActor public func fontScale(_ scale: CGFloat) -> some View {
