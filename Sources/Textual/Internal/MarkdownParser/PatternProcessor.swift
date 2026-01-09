@@ -90,6 +90,20 @@ extension PatternProcessor.Rule {
       )
     }
   }
+
+  static var math: Self {
+    .init(patterns: [.mathBlock, .mathInline]) { token, attributes in
+      guard let latex = token.capturedContent else {
+        return nil
+      }
+
+      let attachment = MathAttachment(
+        latex: latex,
+        style: token.type == .mathBlock ? .block : .inline
+      )
+      return AttributedString("\u{FFFC}", attributes: attributes.attachment(.init(attachment)))
+    }
+  }
 }
 
 extension Array where Element == PatternProcessor.Rule {

@@ -13,9 +13,12 @@ public struct AttributedStringMarkdownParser: MarkupParser {
     /// A set of custom emoji definitions used to expand `:shortcode:` sequences.
     public var emoji: Set<Emoji>
 
+    public var processesMathExpressions: Bool
+
     /// Creates postprocessing options.
-    public init(emoji: Set<Emoji> = []) {
+    public init(emoji: Set<Emoji> = [], processesMathExpressions: Bool = false) {
       self.emoji = emoji
+      self.processesMathExpressions = processesMathExpressions
     }
   }
 
@@ -32,7 +35,8 @@ public struct AttributedStringMarkdownParser: MarkupParser {
     self.options = options
     self.processor = PatternProcessor(
       rules: [
-        patternOptions.emoji.isEmpty ? nil : .emoji(patternOptions.emoji)
+        patternOptions.emoji.isEmpty ? nil : .emoji(patternOptions.emoji),
+        patternOptions.processesMathExpressions ? .math : nil,
       ].compactMap(\.self)
     )
   }
