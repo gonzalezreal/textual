@@ -167,9 +167,7 @@ struct PatternTokenizerTests {
     let tokens = try tokenizer.tokenize(
       """
       Before
-      $$
-      E = mc^2
-      $$
+      $$E = mc^2$$
       After
       """
     )
@@ -178,7 +176,7 @@ struct PatternTokenizerTests {
     #expect(
       tokens == [
         .init(type: .text, content: "Before\n"),
-        .init(type: .mathBlock, content: "$$\nE = mc^2\n$$", capturedContent: "\nE = mc^2\n"),
+        .init(type: .mathBlock, content: "$$E = mc^2$$", capturedContent: "E = mc^2"),
         .init(type: .text, content: "\nAfter"),
       ]
     )

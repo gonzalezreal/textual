@@ -26,6 +26,12 @@ struct MathExpressionDemo: View {
 
             $$\\nabla \\cdot \\vec{E} = \\frac{\\rho}{\\varepsilon_0}$$
 
+            ###### The Cauchy-Schwarz Inequality
+
+            ```math
+            \\left( \\sum_{k=1}^n a_k b_k \\right)^2 \\leq \\left( \\sum_{k=1}^n a_k^2 \\right) \\left( \\sum_{k=1}^n b_k^2 \\right)
+            ```
+
             ## Tiny Debugging Note
 
             We used the loss curve to spot a regression:
