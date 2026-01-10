@@ -40,6 +40,7 @@
             """,
           patternOptions: .init(processesMathExpressions: true)
         )
+        .background(Color.guide)
         .padding(.horizontal)
         .multilineTextAlignment(.leading)
         .textual.mathProperties(.init(textAlignment: .trailing))
