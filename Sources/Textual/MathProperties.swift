@@ -23,7 +23,7 @@ public struct MathProperties: Sendable, Hashable {
     self.fontScale = fontScale
   }
 
-  public static let `default` = MathProperties(fontName: .latinModern, fontScale: 1.0)
+  public static let `default` = MathProperties(fontName: .latinModern, fontScale: 1.2)
 }
 
 extension MathProperties.FontName {
