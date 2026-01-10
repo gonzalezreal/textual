@@ -28,7 +28,7 @@ extension Formatter.InlineNode {
       return "<br />"
     case .attachment(let attachment):
       guard let imageData = attachment.pngData() else {
-        return ""
+        return attachment.description.htmlEscaped()
       }
       let base64 = imageData.base64EncodedString()
       return #"<img src="data:image/png;base64,\#(base64)" />"#
