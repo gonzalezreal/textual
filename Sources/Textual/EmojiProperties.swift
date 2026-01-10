@@ -17,20 +17,14 @@ public struct EmojiProperties: Sendable, Hashable {
 
   /// Creates emoji properties with a custom size and baseline offset.
   public init(
-    size: FontScaled<CGSize>,
-    baselineOffset: FontScaled<CGFloat>
+    size: FontScaled<CGSize> = .fontScaled(width: 1, height: 1),
+    baselineOffset: FontScaled<CGFloat> = .fontScaled(-0.1)
   ) {
     self.size = size
     self.baselineOffset = baselineOffset
   }
-
-  /// The default emoji properties.
-  public static let `default` = EmojiProperties(
-    size: .fontScaled(width: 1, height: 1),
-    baselineOffset: .fontScaled(-0.1)
-  )
 }
 
 extension EnvironmentValues {
-  @Entry var emojiProperties: EmojiProperties = .default
+  @Entry var emojiProperties = EmojiProperties()
 }

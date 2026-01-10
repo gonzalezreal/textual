@@ -2,13 +2,13 @@ import SwiftUI
 @_spi(Textual) private import SwiftUIMath
 
 struct MathAttachment: Attachment {
-  enum Style: Sendable {
+  enum DisplayStyle: Sendable {
     case inline
     case block
   }
 
   var description: String {
-    switch style {
+    switch displayStyle {
     case .inline:
       return "$\(latex)$"
     case .block:
@@ -20,16 +20,16 @@ struct MathAttachment: Attachment {
     .text
   }
 
-  private let latex: String
-  private let style: Style
+  let latex: String
+  let displayStyle: DisplayStyle
 
-  init(latex: String, style: Style) {
+  init(latex: String, style: DisplayStyle) {
     self.latex = latex
-    self.style = style
+    self.displayStyle = style
   }
 
   var body: some View {
-    MathView(latex: latex, style: style)
+    MathView(latex: latex, style: displayStyle)
   }
 
   func baselineOffset(in environment: TextEnvironmentValues) -> CGFloat {
@@ -51,7 +51,7 @@ struct MathAttachment: Attachment {
         name: .init(environment.mathProperties.fontName),
         size: FontScaled(environment.mathProperties.fontScale).resolve(in: environment)
       ),
-      style: .init(style)
+      style: .init(displayStyle)
     )
   }
 }
@@ -60,7 +60,7 @@ private struct MathView: View {
   @Environment(\.textEnvironment) private var environment
 
   let latex: String
-  let style: MathAttachment.Style
+  let style: MathAttachment.DisplayStyle
 
   var body: some View {
     Math(latex)
@@ -82,7 +82,7 @@ extension Math.Font.Name {
 }
 
 extension Math.TypesettingStyle {
-  fileprivate init(_ style: MathAttachment.Style) {
+  fileprivate init(_ style: MathAttachment.DisplayStyle) {
     switch style {
     case .inline:
       self = .text

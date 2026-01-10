@@ -37,8 +37,8 @@ public struct TextEnvironmentValues: Hashable, Sendable {
     font: Font? = nil,
     dynamicTypeSize: DynamicTypeSize = .large,
     legibilityWeight: LegibilityWeight? = nil,
-    emojiProperties: EmojiProperties = .default,
-    mathProperties: MathProperties = .default,
+    emojiProperties: EmojiProperties = .init(),
+    mathProperties: MathProperties = .init(),
     colorScheme: ColorScheme = .light,
     colorSchemeContrast: ColorSchemeContrast = .standard
   ) {

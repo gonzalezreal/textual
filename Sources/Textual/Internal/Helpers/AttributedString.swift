@@ -1,6 +1,21 @@
 import Foundation
 
 extension AttributedStringProtocol {
+  var isMathBlock: Bool {
+    let attachments = self.attachments()
+
+    guard
+      attachments.count == 1,
+      let attachment = attachments.first?.base as? MathAttachment,
+      case .block = attachment.displayStyle
+    else {
+      return false
+    }
+
+    return String(self.characters[...])
+      .trimmingCharacters(in: .whitespacesAndNewlines) == "\u{FFFC}"
+  }
+
   func attachments() -> Set<AnyAttachment> {
     uniqueValues(for: \.textual.attachment)
   }

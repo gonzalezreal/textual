@@ -18,12 +18,17 @@ public struct MathProperties: Sendable, Hashable {
 
   public var fontScale: CGFloat
 
-  public init(fontName: FontName, fontScale: CGFloat) {
+  public var textAlignment: TextAlignment
+
+  public init(
+    fontName: FontName = .latinModern,
+    fontScale: CGFloat = 1.2,
+    textAlignment: TextAlignment = .center
+  ) {
     self.fontName = fontName
     self.fontScale = fontScale
+    self.textAlignment = textAlignment
   }
-
-  public static let `default` = MathProperties(fontName: .latinModern, fontScale: 1.2)
 }
 
 extension MathProperties.FontName {
@@ -42,5 +47,5 @@ extension MathProperties.FontName {
 }
 
 extension EnvironmentValues {
-  @Entry var mathProperties: MathProperties = .default
+  @Entry var mathProperties = MathProperties()
 }

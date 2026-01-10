@@ -2,6 +2,11 @@ import SwiftUI
 
 // MARK: - Deprecated after 0.1.1
 
+extension EmojiProperties {
+  @available(*, deprecated, message: "Use 'EmojiProperties()' instead.")
+  public static let `default` = EmojiProperties()
+}
+
 extension AttachmentSelectionStyle {
   @available(*, deprecated, renamed: "text")
   public static let inline: AttachmentSelectionStyle = .text

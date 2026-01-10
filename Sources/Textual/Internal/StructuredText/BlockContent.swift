@@ -35,6 +35,8 @@ extension StructuredText {
 
     var body: some View {
       switch intent?.kind {
+      case .paragraph where content.isMathBlock:
+        MathBlock(content)
       case .paragraph:
         Paragraph(content)
       case .header(let level):

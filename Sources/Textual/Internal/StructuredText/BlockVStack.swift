@@ -32,6 +32,10 @@ extension StructuredText {
 }
 
 extension StructuredText {
+  struct BlockAlignmentKey: LayoutValueKey {
+    static let defaultValue: TextAlignment? = nil
+  }
+
   fileprivate struct BlockLayoutView<Content: View>: View {
     @Environment(\.listItemSpacingEnabled) private var listItemSpacingEnabled
     @Environment(\.resolvedListItemSpacing) private var resolvedListItemSpacing
@@ -110,8 +114,9 @@ extension StructuredText {
         let viewSize = view.sizeThatFits(viewProposal)
 
         var point = bounds.origin
+        let alignment = view[BlockAlignmentKey.self] ?? textAlignment
 
-        switch textAlignment {
+        switch alignment {
         case .leading:
           break  // do nothing
         case .center:
