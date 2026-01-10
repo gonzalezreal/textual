@@ -17,6 +17,7 @@ public struct TextEnvironmentValues: Hashable, Sendable {
   /// Properties that control how Textual renders emoji.
   public var emojiProperties: EmojiProperties
 
+  /// Properties that control how Textual renders math expressions.
   public var mathProperties: MathProperties
 
   /// The current color scheme in the environment.

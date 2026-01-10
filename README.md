@@ -30,6 +30,7 @@ applies styling through environment values, and uses SwiftUI's layout system to 
 - **Markdown support** via Foundation's `AttributedString` built-in parser
 - **Custom markup parser support** through the `MarkupParser` protocol
 - **Inline attachments** that flow with the text, such as images and custom emoji
+- **Math expressions** rendered as inline or block attachments
 - **Animated image support** (GIF, APNG, WebP)
 - **Syntax highlighting** with customizable themes
 - **Comprehensive styling** for headings, code blocks, tables, links, lists, and more
@@ -109,8 +110,8 @@ Textual ships with Markdown support built on top of Foundation's `AttributedStri
 plug in any format that can produce strings with [`PresentationIntent`](https://developer.apple.com/documentation/foundation/presentationintent)
 attributes by conforming your parser to the `MarkupParser` protocol.
 
-The built-in Markdown parser supports preprocessing patterns, like custom emoji. You can define emoji with shortcodes
-that will be substituted during preprocessing:
+The built-in Markdown parser supports pattern-based expansions, like custom emoji. You can define emoji with
+shortcodes that will be substituted after parsing:
 
 ```swift
 let emoji: Set<Emoji> = [
@@ -130,7 +131,14 @@ InlineText(
 )
 ```
 
-The preprocessing system provides the groundwork for future enhancements like math expression rendering.
+Math expressions are also supported when you enable them in `patternOptions`:
+
+```swift
+StructuredText(
+  markdown: "The area is $A = \\pi r^2$.",
+  patternOptions: .init(mathExpressions: true)
+)
+```
 
 ### Text Selection
 

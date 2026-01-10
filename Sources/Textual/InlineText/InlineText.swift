@@ -61,6 +61,15 @@ import SwiftUI
 /// )
 /// ```
 ///
+/// Math expressions are supported when you enable them in `patternOptions`:
+///
+/// ```swift
+/// InlineText(
+///   markdown: "The area is $A = \\pi r^2$.",
+///   patternOptions: .init(mathExpressions: true)
+/// )
+/// ```
+///
 /// ### Links
 ///
 /// Links use SwiftUI's `openURL` environment action. To customize link handling, override it:

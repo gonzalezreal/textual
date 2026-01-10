@@ -42,7 +42,7 @@ struct MathExpressionDemo: View {
             """,
           patternOptions: .init(
             emoji: .mastoEmoji,
-            processesMathExpressions: true
+            mathExpressions: true
           )
         )
         .textual.textSelection(.enabled)

@@ -2,23 +2,24 @@ import Foundation
 
 /// A ``MarkupParser`` implementation backed by Foundation’s Markdown support.
 ///
-/// This parser uses `AttributedString(markdown:...)` under the hood. Use it when your input is
-/// Markdown and you want Textual to preserve structure via Foundation attributes such as
-/// `PresentationIntent`, inline presentation intents, links, and image URLs.
+/// This parser leverages Foundation’s Markdown support and preserves structure via
+/// presentation intents.
 ///
-/// Textual also supports a postprocessing step for custom emoji substitution.
+/// This parser can process its output to expand custom emoji and math expressions into
+/// inline attachments.
 public struct AttributedStringMarkdownParser: MarkupParser {
   /// Options that control pattern expansion after Markdown parsing.
   public struct PatternOptions: Hashable, Sendable {
     /// A set of custom emoji definitions used to expand `:shortcode:` sequences.
     public var emoji: Set<Emoji>
 
-    public var processesMathExpressions: Bool
+    /// Enables processing of math expressions into attachments.
+    public var mathExpressions: Bool
 
-    /// Creates postprocessing options.
-    public init(emoji: Set<Emoji> = [], processesMathExpressions: Bool = false) {
+    /// Creates pattern options.
+    public init(emoji: Set<Emoji> = [], mathExpressions: Bool = false) {
       self.emoji = emoji
-      self.processesMathExpressions = processesMathExpressions
+      self.mathExpressions = mathExpressions
     }
   }
 
@@ -36,7 +37,7 @@ public struct AttributedStringMarkdownParser: MarkupParser {
     self.processor = PatternProcessor(
       rules: [
         patternOptions.emoji.isEmpty ? nil : .emoji(patternOptions.emoji),
-        patternOptions.processesMathExpressions ? .math : nil,
+        patternOptions.mathExpressions ? .math : nil,
       ].compactMap(\.self)
     )
   }

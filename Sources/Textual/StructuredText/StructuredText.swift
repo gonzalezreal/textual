@@ -150,6 +150,15 @@ extension StructuredText {
   ///   - markdown: The Markdown source to render.
   ///   - baseURL: A base URL used to resolve relative links and image URLs.
   ///   - patternOptions: Options for pattern substitution after markdown parsing.
+  ///
+  /// Math expressions are supported when you enable them in `patternOptions`:
+  ///
+  /// ```swift
+  /// StructuredText(
+  ///   markdown: "The area is $A = \\pi r^2$.",
+  ///   patternOptions: .init(mathExpressions: true)
+  /// )
+  /// ```
   public init(
     markdown: String,
     baseURL: URL? = nil,

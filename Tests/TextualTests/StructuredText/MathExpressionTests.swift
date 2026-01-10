@@ -21,7 +21,7 @@
             \\left( a + b \\right)^2 = a^2 + 2ab + b^2
             ```
             """,
-          patternOptions: .init(processesMathExpressions: true)
+          patternOptions: .init(mathExpressions: true)
         )
         .background(Color.guide)
         .padding(.horizontal)
@@ -38,7 +38,7 @@
 
             Trailing paragraph for context.
             """,
-          patternOptions: .init(processesMathExpressions: true)
+          patternOptions: .init(mathExpressions: true)
         )
         .background(Color.guide)
         .padding(.horizontal)

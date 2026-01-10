@@ -1,6 +1,7 @@
 import SwiftUI
 private import SwiftUIMath
 
+/// Properties that control how Textual renders math expressions.
 public struct MathProperties: Sendable, Hashable {
   public struct FontName: Hashable, Sendable, RawRepresentable, ExpressibleByStringLiteral {
     public let rawValue: String
@@ -14,10 +15,13 @@ public struct MathProperties: Sendable, Hashable {
     }
   }
 
+  /// The math font family to use.
   public var fontName: FontName
 
+  /// Scales the math font relative to the surrounding text.
   public var fontScale: CGFloat
 
+  /// The alignment applied to block math paragraphs.
   public var textAlignment: TextAlignment
 
   public init(
