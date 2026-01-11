@@ -17,7 +17,7 @@ let package = Package(
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-concurrency-extras", from: "1.3.1"),
     .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.7"),
-    .package(url: "https://github.com/gonzalezreal/swiftui-math", branch: "swiftui-refactoring"),
+    .package(url: "https://github.com/gonzalezreal/swiftui-math", from: "0.1.0"),
   ],
   targets: [
     .target(
