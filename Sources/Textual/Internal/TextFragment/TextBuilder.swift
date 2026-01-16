@@ -7,7 +7,7 @@ import SwiftUI
 // resize. When the container size changes, attachment sizes are recomputed and the cache
 // is consulted. If the new sizes hash to the same key, the cached Text is reused.
 //
-// The cache key is derived from the hash of [AnyAttachment: CGSize]. Since attachment
+// The cache key is derived from the hash of [AttachmentKey: CGSize]. Since attachment
 // sizes often remain constant or repeat during incremental resize (e.g., window resizing),
 // this compact key enables effective caching without storing the full proposal or
 // attributed string. The cache has a count limit of 10 to prevent unbounded growth.
@@ -21,7 +21,7 @@ extension TextFragment {
     var text: Text
 
     @ObservationIgnored private let content: Content
-    @ObservationIgnored private let cache: NSCache<KeyBox<[AnyAttachment: CGSize]>, Box<Text>>
+    @ObservationIgnored private let cache: NSCache<KeyBox<[AttachmentKey: CGSize]>, Box<Text>>
 
     init(_ content: Content, environment: TextEnvironmentValues) {
       let attachmentSizes = content.attachmentSizes(for: .unspecified, in: environment)
@@ -61,24 +61,26 @@ extension TextFragment {
 extension Text {
   fileprivate init(
     attributedString: some AttributedStringProtocol,
-    attachmentSizes: [AnyAttachment: CGSize],
+    attachmentSizes: [AttachmentKey: CGSize],
     in environment: TextEnvironmentValues
   ) {
     let textValues = attributedString.runs.map { run in
       var text: Text
 
-      if let attachment = run.textual.attachment,
-        let size = attachmentSizes[attachment]
-      {
-        // Create placeholder
-        var environment = environment
-        environment.font = run.font ?? environment.font
+      var runEnvironment = environment
+      runEnvironment.font = run.font ?? environment.font
 
+      let key = run.textual.attachment.map {
+        AttachmentKey(attachment: $0, font: runEnvironment.font)
+      }
+
+      if let key, let size = attachmentSizes[key] {
+        // Create placeholder
         text = Text(placeholderSize: size)
-          .baselineOffset(attachment.baselineOffset(in: environment))
+          .baselineOffset(key.attachment.baselineOffset(in: runEnvironment))
           .customAttribute(
             AttachmentAttribute(
-              attachment,
+              key.attachment,
               presentationIntent: run.presentationIntent
             )
           )
@@ -107,16 +109,28 @@ extension Text {
 extension AttributedStringProtocol {
   fileprivate func attachmentSizes(
     for proposal: ProposedViewSize, in environment: TextEnvironmentValues
-  ) -> [AnyAttachment: CGSize] {
+  ) -> [AttachmentKey: CGSize] {
     Dictionary(
-      uniqueKeysWithValues: self.runs.compactMap { run in
+      self.runs.compactMap { run in
         guard let attachment = run.textual.attachment else {
           return nil
         }
         var environment = environment
         environment.font = run.font ?? environment.font
-        return (attachment, attachment.sizeThatFits(proposal, in: environment))
-      }
+        return (
+          AttachmentKey(
+            attachment: attachment,
+            font: environment.font
+          ),
+          attachment.sizeThatFits(proposal, in: environment)
+        )
+      },
+      uniquingKeysWith: { existing, _ in existing }
     )
   }
+}
+
+private struct AttachmentKey: Hashable {
+  let attachment: AnyAttachment
+  let font: Font?
 }

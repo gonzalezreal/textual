@@ -23,9 +23,15 @@ struct InlineTextDemo: View {
             **Working late on the new feature** has been surprisingly fun—_even when the build \
             fails_ :confused_dog:, a quick refactor usually gets things back on track :doge:, \
             and when it doesn’t, I just roll with it :dogroll: until the solution finally \
-            clicks (though sometimes I still end up a bit :sad_dog:).
+            clicks (though sometimes I still end up a bit **:confused_dog:** or _small \
+            :confused_dog:_... plus another :confused_dog: for good measure).
             """,
           patternOptions: .init(emoji: .mastoEmoji)
+        )
+        .textual.inlineStyle(
+          InlineStyle()
+            .strong(.bold, .fontScale(1.3))
+            .emphasis(.italic, .fontScale(0.85))
         )
       }
       Section("Custom Inline Style") {
