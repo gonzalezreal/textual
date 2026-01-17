@@ -31,7 +31,10 @@
     @ObservationIgnored
     var selectionDidChange: (() -> Void)?
 
+    @ObservationIgnored
     private var layoutCollection: any TextLayoutCollection
+
+    @ObservationIgnored
     private weak var coordinator: TextSelectionCoordinator?
 
     init(
