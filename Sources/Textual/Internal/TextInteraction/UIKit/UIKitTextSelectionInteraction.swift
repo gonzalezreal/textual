@@ -21,8 +21,8 @@
 
     func body(content: Content) -> some View {
       if let model {
-        content.overlay {
-          UIKitTextInteractionOverlay(model: model)
+        content.overlayPreferenceValue(OverflowFrameKey.self) { frames in
+          UIKitTextInteractionOverlay(model: model, overflowFrames: frames)
         }
       } else {
         content

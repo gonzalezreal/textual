@@ -103,7 +103,6 @@ import SwiftUI
 /// ``MarkupParser`` implementation.
 public struct StructuredText: View {
   @State private var attributedString = AttributedString()
-  @State private var overflowFrames: [CGRect] = []
 
   private let markup: String
   private let parser: any MarkupParser
@@ -122,14 +121,9 @@ public struct StructuredText: View {
         .modifier(TextSelectionInteraction())
         .modifier(TextSelectionCoordination())
     }
-    // Propagate overflow frames
-    .environment(\.overflowFrames, overflowFrames)
     .coordinateSpace(.textContainer)
     .onChange(of: markup, initial: true) {
       markupDidChange(markup)
-    }
-    .onPreferenceChange(OverflowFrameKey.self) { value in
-      overflowFrames = value
     }
     // Disable line limit to avoid per-fragment truncation
     .lineLimit(nil)
