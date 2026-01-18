@@ -53,7 +53,7 @@
     func closestPosition(to point: CGPoint) -> TextPosition? {
       guard !layouts.isEmpty else { return nil }
 
-      let layoutIndex = layoutIndex(closestToY: point.y)
+      let layoutIndex = layoutIndex(closestTo: point)
       let layout = layouts[layoutIndex]
 
       guard !layout.lines.isEmpty else { return nil }
@@ -93,7 +93,7 @@
     func characterRange(at point: CGPoint) -> TextRange? {
       guard !layouts.isEmpty else { return nil }
 
-      let layoutIndex = layoutIndex(closestToY: point.y)
+      let layoutIndex = layoutIndex(closestTo: point)
       let layout = layouts[layoutIndex]
 
       guard !layout.lines.isEmpty else { return nil }
@@ -264,11 +264,11 @@
       return line.typographicBounds.offsetBy(dx: layout.origin.x, dy: layout.origin.y)
     }
 
-    fileprivate func layoutIndex(closestToY y: CGFloat) -> Int {
+    fileprivate func layoutIndex(closestTo point: CGPoint) -> Int {
       var closestIndex = 0
       var closestDistance = CGFloat.greatestFiniteMagnitude
       for (index, layout) in zip(layouts.indices, layouts) {
-        let distance = layout.frame.verticalDistance(to: y)
+        let distance = layout.frame.distanceSquared(to: point)
         if distance < closestDistance {
           closestDistance = distance
           closestIndex = index
@@ -346,6 +346,12 @@
       if x < minX { return minX - x }
       if x > maxX { return x - maxX }
       return 0
+    }
+
+    fileprivate func distanceSquared(to point: CGPoint) -> CGFloat {
+      let dx = horizontalDistance(to: point.x)
+      let dy = verticalDistance(to: point.y)
+      return dx * dx + dy * dy
     }
   }
 #endif
