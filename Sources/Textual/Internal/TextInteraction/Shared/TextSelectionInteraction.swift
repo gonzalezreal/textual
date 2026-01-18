@@ -16,7 +16,7 @@ struct TextSelectionInteraction: ViewModifier {
     @Environment(\.textSelection) private var textSelection
     @Environment(TextSelectionCoordinator.self) private var coordinator: TextSelectionCoordinator?
 
-    @State private var model: TextSelectionModel?
+    @State private var model = TextSelectionModel()
   #endif
 
   func body(content: Content) -> some View {
@@ -26,7 +26,8 @@ struct TextSelectionInteraction: ViewModifier {
           .overlayTextLayoutCollection { layoutCollection in
             Color.clear
               .onChange(of: AnyTextLayoutCollection(layoutCollection), initial: true) {
-                layoutCollectionDidChange(layoutCollection)
+                model.setCoordinator(coordinator)
+                model.setLayoutCollection(layoutCollection)
               }
           }
           .modifier(PlatformTextSelectionInteraction(model: model))
@@ -37,19 +38,6 @@ struct TextSelectionInteraction: ViewModifier {
       content
     #endif
   }
-
-  #if TEXTUAL_ENABLE_TEXT_SELECTION
-    private func layoutCollectionDidChange(_ layoutCollection: any TextLayoutCollection) {
-      if let model {
-        model.setLayoutCollection(layoutCollection)
-      } else {
-        model = TextSelectionModel(
-          layoutCollection: layoutCollection,
-          coordinator: coordinator
-        )
-      }
-    }
-  #endif
 }
 
 #if TEXTUAL_ENABLE_TEXT_SELECTION

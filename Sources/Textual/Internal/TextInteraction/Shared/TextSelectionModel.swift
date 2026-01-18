@@ -38,12 +38,11 @@
     private weak var coordinator: TextSelectionCoordinator?
 
     init(
-      layoutCollection: any TextLayoutCollection,
+      layoutCollection: any TextLayoutCollection = EmptyTextLayoutCollection(),
       coordinator: TextSelectionCoordinator? = nil
     ) {
       self.layoutCollection = layoutCollection
-      self.coordinator = coordinator
-      coordinator?.register(self)
+      setCoordinator(coordinator)
     }
 
     func setLayoutCollection(_ layoutCollection: any TextLayoutCollection) {
@@ -66,6 +65,15 @@
         selectedRange,
         from: oldLayoutCollection
       )
+    }
+
+    func setCoordinator(_ coordinator: TextSelectionCoordinator?) {
+      if self.coordinator === coordinator {
+        return
+      }
+
+      self.coordinator = coordinator
+      coordinator?.register(self)
     }
 
     func url(for point: CGPoint) -> URL? {

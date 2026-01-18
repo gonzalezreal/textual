@@ -13,19 +13,15 @@
   typealias PlatformTextSelectionInteraction = UIKitTextSelectionInteraction
 
   struct UIKitTextSelectionInteraction: ViewModifier {
-    private let model: TextSelectionModel?
+    private let model: TextSelectionModel
 
-    init(model: TextSelectionModel?) {
+    init(model: TextSelectionModel) {
       self.model = model
     }
 
     func body(content: Content) -> some View {
-      if let model {
-        content.overlayPreferenceValue(OverflowFrameKey.self) { frames in
-          UIKitTextInteractionOverlay(model: model, overflowFrames: frames)
-        }
-      } else {
-        content
+      content.overlayPreferenceValue(OverflowFrameKey.self) { frames in
+        UIKitTextInteractionOverlay(model: model, overflowFrames: frames)
       }
     }
   }

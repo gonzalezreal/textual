@@ -15,27 +15,23 @@
   struct AppKitTextSelectionInteraction: ViewModifier {
     @State private var cursorPushed = false
 
-    private let model: TextSelectionModel?
+    private let model: TextSelectionModel
 
-    init(model: TextSelectionModel?) {
+    init(model: TextSelectionModel) {
       self.model = model
     }
 
     func body(content: Content) -> some View {
-      if let model {
-        content
-          // We need the selection model at text fragment level for the
-          // text selection background and selected attachment dimming
-          .environment(model)
-          .overlayPreferenceValue(OverflowFrameKey.self) { frames in
-            AppKitTextInteractionOverlay(model: model, overflowFrames: frames)
-              .onContinuousHover { phase in
-                updateCursor(for: phase, model: model)
-              }
-          }
-      } else {
-        content
-      }
+      content
+        // We need the selection model at text fragment level for the
+        // text selection background and selected attachment dimming
+        .environment(model)
+        .overlayPreferenceValue(OverflowFrameKey.self) { frames in
+          AppKitTextInteractionOverlay(model: model, overflowFrames: frames)
+            .onContinuousHover { phase in
+              updateCursor(for: phase, model: model)
+            }
+        }
     }
 
     private func updateCursor(for phase: HoverPhase, model: TextSelectionModel) {
