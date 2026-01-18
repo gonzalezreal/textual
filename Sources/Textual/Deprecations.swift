@@ -1,5 +1,16 @@
 import SwiftUI
 
+// MARK: - Deprecated after 0.2.0
+
+extension StructuredText.TableStyleConfiguration {
+  @available(
+    *, deprecated, message: "Use 'makeBackground(layout:)' or 'makeOverlay(layout:)' instead."
+  )
+  public var layout: StructuredText.TableLayout {
+    .init()
+  }
+}
+
 // MARK: - Deprecated after 0.1.1
 
 extension EmojiProperties {

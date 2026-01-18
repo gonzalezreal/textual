@@ -4,8 +4,8 @@ extension StructuredText {
   /// A layout description for a rendered table.
   ///
   /// `StructuredText` computes a `TableLayout` from the measured sizes of each cell and provides
-  /// it to ``StructuredText/TableStyle``. Styles can use it to draw dividers or row backgrounds
-  /// that align with the table grid.
+  /// it to ``StructuredText/TableStyle`` when rendering table backgrounds and overlays. Styles
+  /// can use it to draw dividers or row backgrounds that align with the table grid.
   public struct TableLayout: Hashable {
     private struct Row: Hashable {
       var minY: CGFloat
@@ -34,6 +34,10 @@ extension StructuredText {
 
     private let rows: [Row]
     private let columns: [Column]
+
+    init(_ cellBounds: [TableCell.Identifier: Anchor<CGRect>], geometry: GeometryProxy) {
+      self.init(cellBounds.mapValues { geometry[$0] })
+    }
 
     init(_ cellBounds: [TableCell.Identifier: CGRect] = [:]) {
       let rowCount = Set(cellBounds.keys.map(\.row)).count

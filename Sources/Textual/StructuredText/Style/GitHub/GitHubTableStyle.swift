@@ -10,30 +10,32 @@ extension StructuredText {
 
     public func makeBody(configuration: Configuration) -> some View {
       configuration.label
-        .background {
-          Canvas { context, _ in
-            for bounds in configuration.layout.evenRowBounds {
-              context.fill(
-                Path(bounds.integral),
-                with: .style(DynamicColor.gitHubSecondaryBackground)
-              )
-            }
-          }
-        }
-        .overlay {
-          Canvas { context, _ in
-            for divider in configuration.layout.dividers() {
-              context.fill(
-                Path(divider),
-                with: .style(DynamicColor.gitHubBorder)
-              )
-            }
-          }
-        }
         .textual.tableCellSpacing(horizontal: Self.borderWidth, vertical: Self.borderWidth)
         .textual.blockSpacing(.init(top: 0, bottom: 16))
         .padding(Self.borderWidth)
         .border(DynamicColor.gitHubBorder, width: Self.borderWidth)
+    }
+
+    public func makeBackground(layout: StructuredText.TableLayout) -> some View {
+      Canvas { context, _ in
+        for bounds in layout.evenRowBounds {
+          context.fill(
+            Path(bounds.integral),
+            with: .style(DynamicColor.gitHubSecondaryBackground)
+          )
+        }
+      }
+    }
+
+    public func makeOverlay(layout: StructuredText.TableLayout) -> some View {
+      Canvas { context, _ in
+        for divider in layout.dividers() {
+          context.fill(
+            Path(divider),
+            with: .style(DynamicColor.gitHubBorder)
+          )
+        }
+      }
     }
   }
 }

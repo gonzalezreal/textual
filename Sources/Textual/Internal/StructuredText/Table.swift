@@ -4,15 +4,14 @@ import SwiftUI
 //
 // Table uses a two-pass layout system. The first pass renders cells which emit their bounds via
 // preferences. The second pass collects all cell bounds, transforms them from anchor coordinates
-// to geometry coordinates, and creates a TableLayout that styles can use for rendering borders
-// and backgrounds with precise cell positions.
+// to geometry coordinates, and builds a `TableLayout` that the style uses to render overlays
+// (such as grid lines) and backgrounds with precise cell positions.
 
 extension StructuredText {
   struct Table: View {
     @Environment(\.tableStyle) private var tableStyle
 
     @State private var spacing = TableCell.Spacing()
-    @State private var tableLayout = TableLayout()
 
     private let intent: PresentationIntent.IntentType?
     private let content: AttributedSubstring
@@ -31,12 +30,27 @@ extension StructuredText {
     var body: some View {
       let configuration = TableStyleConfiguration(
         label: .init(label),
-        indentationLevel: indentationLevel,
-        layout: tableLayout
+        indentationLevel: indentationLevel
       )
       let resolvedStyle = tableStyle.resolve(configuration: configuration)
         .onPreferenceChange(TableCell.SpacingKey.self) { @MainActor in
           spacing = $0
+        }
+        .backgroundPreferenceValue(TableCell.BoundsKey.self) { values in
+          GeometryReader { geometry in
+            let resolvedBackground = tableStyle.resolveBackground(
+              layout: .init(values, geometry: geometry)
+            )
+            AnyView(resolvedBackground)
+          }
+        }
+        .overlayPreferenceValue(TableCell.BoundsKey.self) { values in
+          GeometryReader { geometry in
+            let resolvedOverlay = tableStyle.resolveOverlay(
+              layout: .init(values, geometry: geometry)
+            )
+            AnyView(resolvedOverlay)
+          }
         }
 
       AnyView(resolvedStyle)
@@ -61,16 +75,6 @@ extension StructuredText {
                 .gridColumnAlignment(alignment(for: columnIndex))
             }
           }
-        }
-      }
-      .backgroundPreferenceValue(TableCell.BoundsKey.self) { values in
-        GeometryReader { geometry in
-          Color.clear
-            .onChange(of: values, initial: true) { _, newValue in
-              tableLayout = TableLayout(
-                newValue.mapValues { geometry[$0] }
-              )
-            }
         }
       }
     }
