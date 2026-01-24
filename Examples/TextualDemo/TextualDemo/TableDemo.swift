@@ -71,7 +71,7 @@ struct TableDemo: View {
         }
         StructuredText(
           markdown: overflowContent,
-          patternOptions: .init(emoji: .mastoEmoji)
+          syntaxExtensions: [.emoji(.mastoEmoji)]
         )
       } header: {
         Text("Overflow Style")
