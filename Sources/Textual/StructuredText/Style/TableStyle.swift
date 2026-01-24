@@ -24,34 +24,12 @@ extension StructuredText {
   /// or through a bundled ``StructuredText/Style``.
   public protocol TableStyle: DynamicProperty {
     associatedtype Body: View
-    associatedtype Background: View
-    associatedtype Overlay: View
 
     /// Creates a view that represents a table.
     @MainActor @ViewBuilder
     func makeBody(configuration: Self.Configuration) -> Self.Body
 
-    /// Creates the background content for a table.
-    @MainActor @ViewBuilder
-    func makeBackground(layout: TableLayout) -> Self.Background
-
-    /// Creates the overlay content for a table.
-    @MainActor @ViewBuilder
-    func makeOverlay(layout: TableLayout) -> Self.Overlay
-
     typealias Configuration = TableStyleConfiguration
-  }
-}
-
-extension StructuredText.TableStyle where Background == EmptyView {
-  public func makeBackground(layout: StructuredText.TableLayout) -> EmptyView {
-    EmptyView()
-  }
-}
-
-extension StructuredText.TableStyle where Overlay == EmptyView {
-  public func makeOverlay(layout: StructuredText.TableLayout) -> EmptyView {
-    EmptyView()
   }
 }
 

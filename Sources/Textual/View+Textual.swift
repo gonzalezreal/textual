@@ -85,6 +85,34 @@ extension TextualNamespace where Base: View {
     }
   }
 
+  /// Adds a background that can align with table cell bounds.
+  ///
+  /// Use this modifier when building custom table styles. It reads table cell bounds from
+  /// preferences and provides a ``StructuredText/TableLayout`` for precise alignment.
+  public func tableBackground(
+    @ViewBuilder content: @escaping (_ layout: StructuredText.TableLayout) -> some View
+  ) -> some View {
+    base.backgroundPreferenceValue(StructuredText.TableCell.BoundsKey.self) { values in
+      GeometryReader { geometry in
+        content(.init(values, geometry: geometry))
+      }
+    }
+  }
+
+  /// Adds an overlay that can align with table cell bounds.
+  ///
+  /// Use this modifier when building custom table styles. It reads table cell bounds from
+  /// preferences and provides a ``StructuredText/TableLayout`` for precise alignment.
+  public func tableOverlay(
+    @ViewBuilder content: @escaping (_ layout: StructuredText.TableLayout) -> some View
+  ) -> some View {
+    base.overlayPreferenceValue(StructuredText.TableCell.BoundsKey.self) { values in
+      GeometryReader { geometry in
+        content(.init(values, geometry: geometry))
+      }
+    }
+  }
+
   /// Sets the spacing used between list items in ``StructuredText``.
   public func listItemSpacing(
     _ listItemSpacing: FontScaled<StructuredText.BlockSpacing>

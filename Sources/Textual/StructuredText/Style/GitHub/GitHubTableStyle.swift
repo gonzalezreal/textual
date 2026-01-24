@@ -12,30 +12,28 @@ extension StructuredText {
       configuration.label
         .textual.tableCellSpacing(horizontal: Self.borderWidth, vertical: Self.borderWidth)
         .textual.blockSpacing(.init(top: 0, bottom: 16))
+        .textual.tableBackground { layout in
+          Canvas { context, _ in
+            for bounds in layout.evenRowBounds {
+              context.fill(
+                Path(bounds.integral),
+                with: .style(DynamicColor.gitHubSecondaryBackground)
+              )
+            }
+          }
+        }
+        .textual.tableOverlay { layout in
+          Canvas { context, _ in
+            for divider in layout.dividers() {
+              context.fill(
+                Path(divider),
+                with: .style(DynamicColor.gitHubBorder)
+              )
+            }
+          }
+        }
         .padding(Self.borderWidth)
         .border(DynamicColor.gitHubBorder, width: Self.borderWidth)
-    }
-
-    public func makeBackground(layout: StructuredText.TableLayout) -> some View {
-      Canvas { context, _ in
-        for bounds in layout.evenRowBounds {
-          context.fill(
-            Path(bounds.integral),
-            with: .style(DynamicColor.gitHubSecondaryBackground)
-          )
-        }
-      }
-    }
-
-    public func makeOverlay(layout: StructuredText.TableLayout) -> some View {
-      Canvas { context, _ in
-        for divider in layout.dividers() {
-          context.fill(
-            Path(divider),
-            with: .style(DynamicColor.gitHubBorder)
-          )
-        }
-      }
     }
   }
 }

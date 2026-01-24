@@ -12,18 +12,17 @@ extension StructuredText {
       configuration.label
         .textual.tableCellSpacing(horizontal: Self.borderWidth, vertical: Self.borderWidth)
         .textual.blockSpacing(.fontScaled(top: 1.6, bottom: 1.6))
-        .padding(Self.borderWidth)
-    }
-
-    public func makeOverlay(layout: StructuredText.TableLayout) -> some View {
-      Canvas { context, _ in
-        for divider in layout.dividers() {
-          context.fill(
-            Path(divider),
-            with: .style(DynamicColor.grayTertiary)
-          )
+        .textual.tableOverlay { layout in
+          Canvas { context, _ in
+            for divider in layout.dividers() {
+              context.fill(
+                Path(divider),
+                with: .style(DynamicColor.grayTertiary)
+              )
+            }
+          }
         }
-      }
+        .padding(Self.borderWidth)
     }
   }
 }

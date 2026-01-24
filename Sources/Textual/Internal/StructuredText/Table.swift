@@ -36,22 +36,6 @@ extension StructuredText {
         .onPreferenceChange(TableCell.SpacingKey.self) { @MainActor in
           spacing = $0
         }
-        .backgroundPreferenceValue(TableCell.BoundsKey.self) { values in
-          GeometryReader { geometry in
-            let resolvedBackground = tableStyle.resolveBackground(
-              layout: .init(values, geometry: geometry)
-            )
-            AnyView(resolvedBackground)
-          }
-        }
-        .overlayPreferenceValue(TableCell.BoundsKey.self) { values in
-          GeometryReader { geometry in
-            let resolvedOverlay = tableStyle.resolveOverlay(
-              layout: .init(values, geometry: geometry)
-            )
-            AnyView(resolvedOverlay)
-          }
-        }
 
       AnyView(resolvedStyle)
     }
