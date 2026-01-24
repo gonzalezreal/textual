@@ -2,7 +2,7 @@ import SwiftUI
 import Textual
 
 struct TableDemo: View {
-  @State private var wrapOverflowTables = false
+  @State private var relativeWidth: CGFloat = 2.1
 
   private let content = """
     Sometimes it helps to step back and *observe the situation calmly*, especially 
@@ -37,22 +37,19 @@ struct TableDemo: View {
   private let overflowContent = """
     When the status board grows beyond the comfort of the sidebar, it’s time for a wider view.
 
-    | Feature Area     | Owner            | Status       | Risk Level | Notes                                                                 |
-    |------------------|------------------|--------------|------------|-----------------------------------------------------------------------|
-    | Attachments      | Casey            | In progress  | Medium     | Needs caching strategy; large emoji sets are still slow to resolve.   |
-    | Selection        | Drew             | Investigating| High       | Selection handles are jittery with nested lists and inline links.     |
-    | Rendering        | Jae              | Stable       | Low        | Layout passes are predictable, but long cells should wrap cleanly.    |
-    | Accessibility    | Morgan           | Planned      | Medium     | Requires structured headings and better focus order on macOS.         |
-    | Markdown Parser  | Priya            | In review    | Low        | Some edge cases around tables and block quotes to validate.           |
+    | Feature Area     | Owner            | Status       | Notes                                                                 |
+    |------------------|------------------|--------------|-----------------------------------------------------------------------|
+    | Attachments      | Casey            | In progress  | Needs caching strategy; large emoji sets are still slow to resolve.   |
+    | Selection        | Drew             | Investigating| Selection handles are jittery with nested lists and inline links.     |
+    | Rendering        | Jae              | Stable       | Layout passes are predictable, but long cells should wrap cleanly.    |
 
     After a few iterations, priorities shift and a more detailed breakdown appears.
 
     | Milestone            | Target Date | Dependency        | Notes                                                  |
-    |----------------------|------------|-------------------|--------------------------------------------------------|
-    | Rendering polish     | Sep 18     | Table overlays    | Needs scrollable headers without losing alignment.     |
-    | Selection fixes      | Sep 25     | Text layout       | Requires stable geometry on fast resize changes.       |
-    | Attachment pipeline  | Oct 02     | Caching strategy  | Large emoji sets should avoid repeated decode work.    |
-    | Accessibility audit  | Oct 09     | Focus navigation  | Verify keyboard traversal and VoiceOver announcements. |
+    |----------------------|-------------|-------------------|--------------------------------------------------------|
+    | Rendering polish     | Sep 18      | Table overlays    | Needs scrollable headers without losing alignment.     |
+    | Selection fixes      | Sep 25      | Text layout       | Requires stable geometry on fast resize changes.       |
+    | Attachment pipeline  | Oct 02      | Caching strategy  | Large emoji sets should avoid repeated decode work.    |
     """
 
   var body: some View {
@@ -67,6 +64,20 @@ struct TableDemo: View {
         Text("Default Style")
         Text("Text Selection Enabled")
       }
+      Section {
+        HStack {
+          Text("Relative Width")
+          Slider(value: $relativeWidth, in: 1...3)
+        }
+        StructuredText(
+          markdown: overflowContent,
+          patternOptions: .init(emoji: .mastoEmoji)
+        )
+      } header: {
+        Text("Overflow Style")
+        Text("Horizontal Scroll")
+      }
+      .textual.tableStyle(.overflow(relativeWidth: relativeWidth))
       Section("GitHub Style") {
         StructuredText(
           markdown: content,
@@ -74,18 +85,6 @@ struct TableDemo: View {
         )
       }
       .textual.structuredTextStyle(.gitHub)
-      Section {
-        Toggle("Wrap Tables", isOn: $wrapOverflowTables)
-        StructuredText(
-          markdown: overflowContent,
-          patternOptions: .init(emoji: .mastoEmoji)
-        )
-        .textual.tableStyle(.overflow(maxWidthRatio: 2))
-        .textual.overflowMode(wrapOverflowTables ? .wrap : .scroll)
-      } header: {
-        Text("Overflow Style")
-        Text("Horizontal Scroll")
-      }
     }
     .formStyle(.grouped)
   }
