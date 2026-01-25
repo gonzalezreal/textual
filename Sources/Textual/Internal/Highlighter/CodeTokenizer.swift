@@ -33,7 +33,7 @@ struct CodeToken: Hashable, Sendable {
       }
 
       guard
-        let bundleURL = Bundle.module.url(
+        let bundleURL = Bundle.textual?.url(
           forResource: "prism-bundle",
           withExtension: "js"
         ),
