@@ -33,13 +33,13 @@ struct CodeToken: Hashable, Sendable {
       }
 
       guard
-        let bundleURL = Bundle.module.url(
+        let bundleURL = TextualResources.bundle.url(
           forResource: "prism-bundle",
           withExtension: "js"
         ),
         let script = try? String(contentsOf: bundleURL, encoding: .utf8)
       else {
-        logger.error("Prism JavaScript bundle is missing.")
+        logger.error("Prism JavaScript bundle is missing from bundle: \(TextualResources.bundle.bundlePath)")
         return nil
       }
 
