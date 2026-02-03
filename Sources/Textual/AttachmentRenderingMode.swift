@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Defines how inline attachments are rendered in text.
-public enum AttachmentRenderingMode {
+public enum AttachmentRenderingMode: Sendable {
   /// Renders attachments using Canvas symbols (default).
   ///
   /// This mode is more performant as views are resolved once and drawn as symbols.
