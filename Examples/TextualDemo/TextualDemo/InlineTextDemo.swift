@@ -44,8 +44,54 @@ struct InlineTextDemo: View {
         )
         .textual.inlineStyle(.custom)
       }
+      Section("Interactive Pill Attachments") {
+        PillDemoView()
+      }
     }
     .formStyle(.grouped)
+  }
+}
+
+// MARK: - Pill Demo View
+
+struct PillDemoView: View {
+  var body: some View {
+    InlineText("pills", parser: PillDemoParser())
+      .attachmentRenderingMode(.interactive)  // Enable interactive attachments
+      .textual.textSelection(.enabled)
+  }
+}
+
+// MARK: - Pill Demo Parser
+
+@MainActor
+struct PillDemoParser: MarkupParser {
+  func attributedString(for input: String) throws -> AttributedString {
+    var text = AttributedString("This paragraph demonstrates inline ")
+
+    // Add first pill
+    var pill1 = AttributedString("PubMed")
+    pill1.textual.attachment = AnyAttachment(
+      PillAttachment(text: "PubMed", onTap: {
+        print("Tapped PubMed pill!")
+      })
+    )
+    text.append(pill1)
+
+    text.append(AttributedString(" and "))
+
+    // Add second pill
+    var pill2 = AttributedString("NICE")
+    pill2.textual.attachment = AnyAttachment(
+      PillAttachment(text: "NICE", onTap: {
+        print("Tapped NICE pill!")
+      })
+    )
+    text.append(pill2)
+
+    text.append(AttributedString(" interactive pill attachments flowing naturally with the text, even when the text wraps to multiple lines."))
+
+    return text
   }
 }
 
