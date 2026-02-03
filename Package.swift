@@ -32,6 +32,7 @@ let package = Package(
       swiftSettings: [
         .define("TEXTUAL_ENABLE_LINKS", .when(platforms: [.macOS, .iOS, .watchOS, .visionOS])),
         .define("TEXTUAL_ENABLE_TEXT_SELECTION", .when(platforms: [.macOS, .iOS, .visionOS])),
+        .unsafeFlags(["-enable-library-evolution"]),
       ]
     ),
     .testTarget(
