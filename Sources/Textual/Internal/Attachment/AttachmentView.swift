@@ -38,7 +38,7 @@ struct AttachmentView: View {
   }
 
   var body: some View {
-    // Debug: mode: \(renderingMode), attachments count: \(attachments.count)
+    let _ = print("🎯 AttachmentView.body - mode: \(renderingMode), attachments count: \(attachments.count)")
     switch renderingMode {
     case .canvas:
       canvasRendering
