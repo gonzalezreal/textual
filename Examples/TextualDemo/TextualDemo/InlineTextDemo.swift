@@ -56,9 +56,29 @@ struct InlineTextDemo: View {
 
 struct PillDemoView: View {
   var body: some View {
-    InlineText("pills", parser: PillDemoParser())
-      .attachmentRenderingMode(.interactive)  // Enable interactive attachments
-      .textual.textSelection(.enabled)
+    VStack(spacing: 16) {
+      // Test 1: Regular link (baseline - we know this works)
+      InlineText(markdown: "Tap this [regular link](https://example.com) to test.")
+        .environment(\.openURL, OpenURLAction { url in
+          print("🔗 Regular link tapped: \(url)")
+          return .handled
+        })
+
+      // Test 2: Custom URL scheme for citations
+      InlineText(markdown: "This is text with [PubMed](citation://0) and [NICE](citation://1) inline.")
+        .environment(\.openURL, OpenURLAction { url in
+          print("🎯 Link tapped: \(url)")
+          if url.scheme == "citation" {
+            print("   ✅ Citation link detected!")
+            if let host = url.host, let index = Int(host) {
+              print("   📍 Citation index: \(index)")
+            }
+            return .handled
+          }
+          return .systemAction
+        })
+    }
+    .padding()
   }
 }
 
