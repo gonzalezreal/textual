@@ -32,19 +32,18 @@ struct PillAttachment: Attachment {
       .padding(.vertical, 4)
       .background(Color(red: 0xf4/255.0, green: 0xe7/255.0, blue: 0xdd/255.0))
       .clipShape(RoundedRectangle(cornerRadius: 8))
+      .fixedSize()  // Prevent stretching in Canvas mode
     }
     .buttonStyle(.plain)
   }
 
   nonisolated func sizeThatFits(_ proposal: ProposedViewSize, in environment: TextEnvironmentValues) -> CGSize {
-    // Emoji (~12) + gap (4) + text (~6pts per char) + horizontal padding (8 * 2)
-    let textWidth = CGFloat(text.count) * 6
-    let baseWidth = 12 + 4 + textWidth + 16
-    // Increase width by 50%
-    let width = baseWidth * 1.5
-    // Vertical padding (4 * 2) + text height (~12)
+    // More accurate sizing based on actual content
+    // Icon: 12pt, gap: 4pt, text: ~7pt per char, padding: 8pt each side
+    let textWidth = CGFloat(text.count) * 7
+    let width = 12 + 4 + textWidth + 16
     let height: CGFloat = 20
-    return CGSize(width: min(width, proposal.width ?? width), height: height)
+    return CGSize(width: width, height: height)
   }
 
   nonisolated func baselineOffset(in environment: TextEnvironmentValues) -> CGFloat {
