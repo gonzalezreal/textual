@@ -16,12 +16,34 @@ import SwiftUI
 // sizeThatFits(_:in:) result. Placeholders are tagged with AttachmentAttribute so overlays
 // can identify and render the actual attachment views at the resolved layout positions.
 
+// MARK: - HashableCGSize
+//
+// A wrapper around CGSize that conforms to Hashable on all iOS versions.
+// CGSize itself only conforms to Hashable in iOS 18+, so this wrapper provides
+// compatibility with iOS 17.
+private struct HashableCGSize: Hashable {
+  let size: CGSize
+
+  init(_ size: CGSize) {
+    self.size = size
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(size.width)
+    hasher.combine(size.height)
+  }
+
+  static func == (lhs: HashableCGSize, rhs: HashableCGSize) -> Bool {
+    lhs.size == rhs.size
+  }
+}
+
 extension TextFragment {
   @MainActor @Observable final class TextBuilder {
     var text: Text
 
     @ObservationIgnored private let content: Content
-    @ObservationIgnored private let cache: NSCache<KeyBox<[AttachmentKey: CGSize]>, Box<Text>>
+    @ObservationIgnored private let cache: NSCache<KeyBox<[AttachmentKey: HashableCGSize]>, Box<Text>>
 
     init(_ content: Content, environment: TextEnvironmentValues) {
       let attachmentSizes = content.attachmentSizes(for: .unspecified, in: environment)
@@ -35,12 +57,12 @@ extension TextFragment {
       self.cache = NSCache()
       self.cache.countLimit = 10
 
-      self.cache.setObject(Box(self.text), forKey: KeyBox(attachmentSizes))
+      self.cache.setObject(Box(self.text), forKey: KeyBox(attachmentSizes.mapValues(HashableCGSize.init)))
     }
 
     func sizeChanged(_ size: CGSize, environment: TextEnvironmentValues) {
       let attachmentSizes = content.attachmentSizes(for: .init(size), in: environment)
-      let cacheKey = KeyBox(attachmentSizes)
+      let cacheKey = KeyBox(attachmentSizes.mapValues(HashableCGSize.init))
 
       if let text = cache.object(forKey: cacheKey) {
         self.text = text.wrappedValue

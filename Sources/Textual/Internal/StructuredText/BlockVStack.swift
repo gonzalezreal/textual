@@ -10,6 +10,25 @@ import SwiftUI
 // spacing within lists regardless of individual block preferences.
 
 extension StructuredText {
+  // iOS 17 fallback root for _VariadicView
+  @available(iOS, deprecated: 18.0, message: "Use Group(subviews:) instead")
+  @available(macOS, deprecated: 15.0, message: "Use Group(subviews:) instead")
+  @available(tvOS, deprecated: 18.0, message: "Use Group(subviews:) instead")
+  @available(watchOS, deprecated: 11.0, message: "Use Group(subviews:) instead")
+  @available(visionOS, deprecated: 2.0, message: "Use Group(subviews:) instead")
+  fileprivate struct BlockVStackLayoutRoot: _VariadicView_UnaryViewRoot {
+    let textAlignment: TextAlignment
+
+    @ViewBuilder
+    func body(children: _VariadicView.Children) -> some View {
+      BlockVStackLayout(textAlignment: textAlignment) {
+        ForEach(children) { child in
+          BlockLayoutView(child)
+        }
+      }
+    }
+  }
+
   struct BlockVStack<Content: View>: View {
     @Environment(\.multilineTextAlignment) private var textAlignment
 
@@ -20,11 +39,18 @@ extension StructuredText {
     }
 
     var body: some View {
-      Group(subviews: content) { children in
-        BlockVStackLayout(textAlignment: textAlignment) {
-          ForEach(children) {
-            BlockLayoutView($0)
+      if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
+        Group(subviews: content) { children in
+          BlockVStackLayout(textAlignment: textAlignment) {
+            ForEach(children) {
+              BlockLayoutView($0)
+            }
           }
+        }
+      } else {
+        // iOS 17 fallback: Use _VariadicView for subview access
+        _VariadicView.Tree(BlockVStackLayoutRoot(textAlignment: textAlignment)) {
+          content
         }
       }
     }
@@ -32,6 +58,7 @@ extension StructuredText {
 }
 
 extension StructuredText {
+
   struct BlockAlignmentKey: LayoutValueKey {
     static let defaultValue: TextAlignment? = nil
   }

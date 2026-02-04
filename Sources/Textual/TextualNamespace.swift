@@ -19,7 +19,7 @@ import Foundation
 /// Other types can opt into it by conforming to ``TextualCompatible``.
 public struct TextualNamespace<Base> {
   @usableFromInline let base: Base
-  @inlinable public init(_ base: Base) { self.base = base }
+  public init(_ base: Base) { self.base = base }
 }
 
 extension TextualNamespace: Sendable where Base: Sendable {}

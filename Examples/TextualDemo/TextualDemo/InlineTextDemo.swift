@@ -44,8 +44,62 @@ struct InlineTextDemo: View {
         )
         .textual.inlineStyle(.custom)
       }
+      Section("Interactive Pill Attachments") {
+        PillDemoView()
+      }
     }
     .formStyle(.grouped)
+  }
+}
+
+// MARK: - Pill Demo View
+
+struct PillDemoView: View {
+  var body: some View {
+    InlineText("pills", parser: PillDemoParser())
+      .attachmentRenderingMode(.canvas)  // Use canvas - pills render correctly as images
+      .environment(\.openURL, OpenURLAction { url in
+        print("🎯 Pill tapped: \(url)")
+        if url.scheme == "citation" {
+          print("   ✅ Citation link detected!")
+          if let host = url.host, let index = Int(host) {
+            print("   📍 Citation index: \(index)")
+          }
+          return .handled
+        }
+        return .systemAction
+      })
+  }
+}
+
+// MARK: - Pill Demo Parser
+
+@MainActor
+struct PillDemoParser: MarkupParser {
+  func attributedString(for input: String) throws -> AttributedString {
+    var text = AttributedString("This paragraph demonstrates inline ")
+
+    // Add first pill - attachment for visual + link for tap handling
+    var pill1 = AttributedString("\u{FFFC}")  // Object replacement character for attachment
+    pill1.textual.attachment = AnyAttachment(
+      PillAttachment(text: "PubMed", onTap: nil)  // Don't need onTap, link handles it
+    )
+    pill1.link = URL(string: "citation://0")  // Link makes it tappable
+    text.append(pill1)
+
+    text.append(AttributedString(" and "))
+
+    // Add second pill
+    var pill2 = AttributedString("\u{FFFC}")
+    pill2.textual.attachment = AnyAttachment(
+      PillAttachment(text: "NICE", onTap: nil)
+    )
+    pill2.link = URL(string: "citation://1")
+    text.append(pill2)
+
+    text.append(AttributedString(" interactive pill attachments flowing naturally with the text, even when the text wraps to multiple lines."))
+
+    return text
   }
 }
 

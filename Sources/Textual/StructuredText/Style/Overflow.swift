@@ -60,35 +60,71 @@ public struct Overflow<Content: View>: View {
         .frame(maxWidth: .infinity, alignment: .leading)
 
     case .scroll:
-      ScrollView(.horizontal) {
-        ZStack {
-          // Update the scroll view height when the content height changes
-          Color.clear
-            .frame(minHeight: contentHeight)
-          content(.scroll(containerWidth: containerWidth))
-            .onGeometryChange(for: CGFloat.self, of: \.size.height) {
-              contentHeight = $0
-            }
-            // Make text selection local in scrollable regions
-            .modifier(TextSelectionInteraction())
-            .transformPreference(Text.LayoutKey.self) { value in
-              value = []
-            }
+      if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
+        ScrollView(.horizontal) {
+          ZStack {
+            // Update the scroll view height when the content height changes
+            Color.clear
+              .frame(minHeight: contentHeight)
+            content(.scroll(containerWidth: containerWidth))
+              .onGeometryChange(for: CGFloat.self, of: \.size.height) {
+                contentHeight = $0
+              }
+              // Make text selection local in scrollable regions
+              .modifier(TextSelectionInteraction())
+              .transformPreference(Text.LayoutKey.self) { value in
+                value = []
+              }
+          }
         }
-      }
-      .onScrollGeometryChange(for: CGFloat.self, of: \.containerSize.width) {
-        containerWidth = $1
-      }
-      // Propagate gesture exclusion area
-      .background(
-        GeometryReader { geometry in
-          Color.clear
-            .preference(
-              key: OverflowFrameKey.self,
-              value: [geometry.frame(in: .textContainer)]
-            )
+        .onScrollGeometryChange(for: CGFloat.self, of: \.containerSize.width) {
+          containerWidth = $1
         }
-      )
+        // Propagate gesture exclusion area
+        .background(
+          GeometryReader { geometry in
+            Color.clear
+              .preference(
+                key: OverflowFrameKey.self,
+                value: [geometry.frame(in: .textContainer)]
+              )
+          }
+        )
+      } else {
+        // iOS 17 fallback using GeometryReader
+        ScrollView(.horizontal) {
+          ZStack {
+            Color.clear
+              .frame(minHeight: contentHeight)
+            content(.scroll(containerWidth: containerWidth))
+              .background(
+                GeometryReader { geometry in
+                  Color.clear
+                    .task(id: geometry.size.height) {
+                      contentHeight = geometry.size.height
+                    }
+                }
+              )
+              // Make text selection local in scrollable regions
+              .modifier(TextSelectionInteraction())
+              .transformPreference(Text.LayoutKey.self) { value in
+                value = []
+              }
+          }
+        }
+        .background(
+          GeometryReader { geometry in
+            Color.clear
+              .task(id: geometry.size.width) {
+                containerWidth = geometry.size.width
+              }
+              .preference(
+                key: OverflowFrameKey.self,
+                value: [geometry.frame(in: .textContainer)]
+              )
+          }
+        )
+      }
     }
   }
 }
