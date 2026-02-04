@@ -38,6 +38,7 @@ struct AttachmentView: View {
   }
 
   var body: some View {
+    print("🎯 AttachmentView.body - mode: \(renderingMode), attachments count: \(attachments.count)")
     switch renderingMode {
     case .canvas:
       canvasRendering
@@ -51,6 +52,7 @@ struct AttachmentView: View {
   private var canvasRendering: some View {
     Canvas { context, _ in
       context.translateBy(x: origin.x, y: origin.y)
+      var attachmentCount = 0
       for (lineIndex, line) in zip(layout.indices, layout) {
         for (runIndex, run) in zip(line.indices, line) {
           guard
@@ -59,6 +61,8 @@ struct AttachmentView: View {
           else {
             continue
           }
+          attachmentCount += 1
+          print("🖼️ Canvas rendering attachment \(attachmentCount): \(attachment.description)")
 
           context.opacity = opacity(
             for: attachment,
@@ -69,8 +73,11 @@ struct AttachmentView: View {
           context.draw(symbol, in: run.typographicBounds.rect)
         }
       }
+      print("🖼️ Canvas total attachments rendered: \(attachmentCount)")
     } symbols: {
+      print("🎨 Canvas symbols block - creating symbols for \(attachments.count) attachments")
       ForEach(Array(attachments), id: \.self) { attachment in
+        print("🎨 Canvas creating symbol for: \(attachment.description)")
         attachment.body
           .tag(attachment)
       }
@@ -80,8 +87,11 @@ struct AttachmentView: View {
   // MARK: - Interactive Rendering (New)
 
   private var interactiveRendering: some View {
-    ZStack(alignment: .topLeading) {
-      ForEach(attachmentPositions) { position in
+    let positions = attachmentPositions
+    print("🎮 Interactive rendering - positions count: \(positions.count)")
+    return ZStack(alignment: .topLeading) {
+      ForEach(positions) { position in
+        print("🎮 Interactive rendering attachment: \(position.attachment.description)")
         position.attachment.body
           .opacity(position.opacity)
           .frame(width: position.bounds.width, height: position.bounds.height)
