@@ -59,7 +59,7 @@ enum AttachmentSizing {
 extension Font {
     /// Convert SwiftUI Font to platform font for text measurement
     /// Note: This handles common cases but may not be perfect for all Font types
-    func toPlatformFont() -> AttachmentSizing.PlatformFont {
+    nonisolated func toPlatformFont() -> AttachmentSizing.PlatformFont {
         // For system fonts, we can extract size and weight
         // This is a simplified conversion - production code may need more cases
 
