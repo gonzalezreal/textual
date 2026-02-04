@@ -38,12 +38,17 @@ struct PillAttachment: Attachment {
   }
 
   nonisolated func sizeThatFits(_ proposal: ProposedViewSize, in environment: TextEnvironmentValues) -> CGSize {
-    // More accurate sizing based on actual content
-    // Icon: 12pt, gap: 4pt, text: ~7pt per char, padding: 8pt each side
-    let textWidth = CGFloat(text.count) * 7
-    let width = 12 + 4 + textWidth + 16
-    let height: CGFloat = 20
-    return CGSize(width: width, height: height)
+    // Accurate sizing using actual text measurement to prevent stretching in Canvas mode
+    // Icon: 12pt emoji, gap: 4pt, text: measured, padding: 8pt each side
+    return AttachmentSizing.measurePill(
+      text: text,
+      iconWidth: 12,         // Emoji width
+      fontSize: 12,          // Text font size
+      fontWeight: .medium,   // Text font weight
+      horizontalPadding: 16, // 8pt left + 8pt right
+      verticalPadding: 8,    // 4pt top + 4pt bottom
+      spacing: 4             // Gap between emoji and text
+    )
   }
 
   nonisolated func baselineOffset(in environment: TextEnvironmentValues) -> CGFloat {
