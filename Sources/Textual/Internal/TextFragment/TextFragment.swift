@@ -37,10 +37,6 @@ struct TextFragment<Content: AttributedStringProtocol>: View {
 
   var body: some View {
     let attachments = content.attachments()
-    print("📋 TextFragment attachments: \(attachments.count)")
-    for attachment in attachments {
-      print("  - \(attachment.description)")
-    }
     return text
       .customAttribute(TextFragmentAttribute())
       .onGeometryChange(for: CGSize?.self, of: \.textContainerSize) { size in
