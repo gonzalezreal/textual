@@ -18,8 +18,8 @@ import Foundation
 /// SwiftUI views get the namespace through the ``SwiftUICore/View/textual`` property.
 /// Other types can opt into it by conforming to ``TextualCompatible``.
 public struct TextualNamespace<Base> {
-  @usableFromInline var base: Base
-  @inlinable public init(_ base: Base) { self.base = base }
+  @usableFromInline let base: Base
+  public init(_ base: Base) { self.base = base }
 }
 
 extension TextualNamespace: Sendable where Base: Sendable {}
