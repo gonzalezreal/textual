@@ -110,6 +110,7 @@
     @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
       let location = gesture.location(in: self)
       guard let url = model.url(for: location) else {
+        model.selectedRange = nil
         return
       }
       openURL(url)
