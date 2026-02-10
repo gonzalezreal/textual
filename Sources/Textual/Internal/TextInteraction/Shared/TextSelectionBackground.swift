@@ -10,7 +10,7 @@ import SwiftUI
 
 struct TextSelectionBackground: ViewModifier {
   func body(content: Content) -> some View {
-    #if TEXTUAL_ENABLE_TEXT_SELECTION && canImport(AppKit)
+    #if TEXTUAL_ENABLE_TEXT_SELECTION && canImport(AppKit) && !targetEnvironment(macCatalyst)
       content
         .backgroundPreferenceValue(Text.LayoutKey.self) { value in
           if let anchoredLayout = value.first {
