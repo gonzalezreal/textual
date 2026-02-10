@@ -12,7 +12,7 @@ extension PlatformImage {
     bundle: Bundle?,
     environment: ColorEnvironmentValues
   ) -> PlatformImage? {
-    #if canImport(AppKit)
+    #if canImport(AppKit) && !targetEnvironment(macCatalyst)
       guard let appearance = NSAppearance(environment: environment) else {
         return nil
       }
@@ -48,7 +48,7 @@ extension SwiftUI.Image {
   }
 }
 
-#if canImport(AppKit)
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
   extension NSAppearance {
     convenience init?(environment: ColorEnvironmentValues) {
       switch (environment.colorScheme, environment.colorSchemeContrast) {
