@@ -1,6 +1,11 @@
 import Foundation
 
 extension AttributedStringProtocol {
+  /// Returns `true` if any run contains a `TextRunEffect` attribute.
+  var hasTextEffect: Bool {
+    runs.contains { $0.textualEffect != nil }
+  }
+
   var isMathBlock: Bool {
     let attachments = self.attachments()
 

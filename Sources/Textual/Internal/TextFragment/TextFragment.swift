@@ -24,9 +24,14 @@ import SwiftUI
 //
 // TextFragment is used by InlineText and StructuredText (via BlockContent) to render
 // attributed content with inline attachments, links, and selection.
+//
+// TextualTextRenderer handles custom text run effects that are
+// applied through the TextProperty system. Effects are stored in AttributeContainer
+// and rendered during the text drawing phase.
 
 struct TextFragment<Content: AttributedStringProtocol>: View {
   @Environment(\.textEnvironment) private var textEnvironment
+  @Environment(\.animatableEffect) private var animatableEffect
   @State private var textBuilder: TextBuilder?
 
   private let content: Content
@@ -35,9 +40,16 @@ struct TextFragment<Content: AttributedStringProtocol>: View {
     self.content = content
   }
 
+  /// Returns `true` if a custom text renderer is needed.
+  ///
+  /// The renderer is needed when there's an animatable effect in the environment
+  /// or when the content contains static text run effects.
+  private var needsCustomRenderer: Bool {
+    animatableEffect != nil || content.hasTextEffect
+  }
+
   var body: some View {
-    text
-      .customAttribute(TextFragmentAttribute())
+    textView
       .onGeometryChange(for: CGSize?.self, of: \.textContainerSize) { size in
         guard let size, let textBuilder else { return }
         textBuilder.sizeChanged(size, environment: textEnvironment)
@@ -48,6 +60,17 @@ struct TextFragment<Content: AttributedStringProtocol>: View {
       .modifier(TextSelectionBackground())
       .modifier(AttachmentOverlay(attachments: content.attachments()))
       .modifier(TextLinkInteraction())
+  }
+
+  @ViewBuilder
+  private var textView: some View {
+    let baseText = text.customAttribute(TextFragmentAttribute())
+
+    if needsCustomRenderer {
+      baseText.textRenderer(TextualTextRenderer(animatableEffect: animatableEffect))
+    } else {
+      baseText
+    }
   }
 
   private var text: Text {
