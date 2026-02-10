@@ -93,6 +93,16 @@ extension Text {
         text = text.customAttribute(LinkAttribute(link))
       }
 
+      // Add effect attribute for TextualTextRenderer
+      if let effect = run.textualEffect {
+        // Check if this is an animatable effect marker
+        if let markerID = effect.animatableEffectMarkerID {
+          text = text.customAttribute(AnimatableEffectMarkerAttribute(effectTypeID: markerID))
+        } else {
+          text = text.customAttribute(TextEffectAttribute(effect: effect))
+        }
+      }
+
       return text
     }
 

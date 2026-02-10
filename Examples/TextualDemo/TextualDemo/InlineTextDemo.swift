@@ -44,8 +44,51 @@ struct InlineTextDemo: View {
         )
         .textual.inlineStyle(.custom)
       }
+      Section("Highlight Effect") {
+        HighlightEffectDemo()
+      }
     }
     .formStyle(.grouped)
+  }
+}
+
+struct HighlightEffectDemo: View {
+  @State private var progress: CGFloat = 0
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      InlineText(
+        markdown: """
+          This demonstrates the **animated highlighter** effect. Watch how the \
+          **important text** gets highlighted with a smooth animation, making it \
+          easy to draw attention to **key information** in your content.
+          """
+      )
+      .textual.inlineStyle(
+        InlineStyle()
+          .strong(EffectProperty(AnimatableEffectMarker<HighlightEffect>()))
+      )
+      .textual.animatableEffect(HighlightEffect(
+        color: .yellow,
+        animationProgress: progress
+      ))
+      .onAppear {
+        startAnimation()
+      }
+
+      Button("Replay Animation") {
+        startAnimation()
+      }
+    }
+  }
+
+  private func startAnimation() {
+    progress = 0
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+      withAnimation {
+        progress = 1
+      }
+    }
   }
 }
 
@@ -67,3 +110,60 @@ extension InlineStyle {
 #Preview {
   InlineTextDemo()
 }
+
+// MARK: - HighlightEffect
+
+/// An animated highlighter pen effect for text.
+struct HighlightEffect: TextRunEffect {
+  var color: Color
+  var animationProgress: CGFloat
+  var verticalOffset: CGFloat
+  var heightRatio: CGFloat
+
+  init(
+    color: Color = .yellow,
+    animationProgress: CGFloat = 1.0,
+    verticalOffset: CGFloat = 0.5,
+    heightRatio: CGFloat = 0.6
+  ) {
+    self.color = color
+    self.animationProgress = animationProgress
+    self.verticalOffset = verticalOffset
+    self.heightRatio = heightRatio
+  }
+
+  public var animatableData: CGFloat {
+    get { animationProgress }
+    set { animationProgress = newValue }
+  }
+
+  func draw(run: Text.Layout.Run, in context: inout GraphicsContext) {
+    let bounds = run.typographicBounds.rect
+
+    let highlightHeight = bounds.height * heightRatio
+    let highlightY = bounds.minY + (bounds.height - highlightHeight) * verticalOffset
+
+    let highlightRect = CGRect(
+      x: bounds.minX,
+      y: highlightY,
+      width: bounds.width * animationProgress,
+      height: highlightHeight
+    )
+
+    let gradient = Gradient(colors: [
+      color.opacity(0.2),
+      color.opacity(0.5),
+      color.opacity(0.3)
+    ])
+
+    context.fill(
+      Path(roundedRect: highlightRect, cornerRadius: 8),
+      with: .linearGradient(
+        gradient,
+        startPoint: CGPoint(x: highlightRect.minX, y: highlightRect.minY),
+        endPoint: CGPoint(x: highlightRect.maxX, y: highlightRect.maxY)
+      )
+    )
+  }
+}
+
