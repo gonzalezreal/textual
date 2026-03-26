@@ -38,16 +38,21 @@
       fatalError("init(coder:) has not been implemented")
     }
 
-    override func hitTest(_ point: NSPoint) -> NSView? {
-      let localPoint = convert(point, from: superview)
-      let isExcluded = exclusionRects.contains {
-        $0.contains(localPoint)
-      }
+    /// AppKit / SwiftUI hit-test this during hover and tracking-area work; like a nonisolated
+    /// `isFlipped` override, a plain `override` can fault in `_checkExpectedExecutor` (Swift 6)
+    /// on the `@objc` entry path.
+    nonisolated override func hitTest(_ point: NSPoint) -> NSView? {
+      MainActor.assumeIsolated {
+        let localPoint = convert(point, from: superview)
+        let isExcluded = exclusionRects.contains {
+          $0.contains(localPoint)
+        }
 
-      if isExcluded {
-        return nil
-      } else {
-        return super.hitTest(point)
+        if isExcluded {
+          return nil
+        } else {
+          return super.hitTest(point)
+        }
       }
     }
 
