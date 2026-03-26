@@ -16,7 +16,12 @@
     var openURL: OpenURLAction
 
     override var acceptsFirstResponder: Bool { true }
-    override var isFlipped: Bool { true }
+
+    /// AppKit may call `isFlipped` while updating tracking areas without an active Swift
+    /// concurrency task. Because `NSView` is `MainActor`, an ordinary `override` runs an
+    /// executor check that can crash (invalid executor reference) in Swift 6 when other
+    /// executors are present in the process. The return value is fixed.
+    nonisolated override var isFlipped: Bool { true }
 
     private var dragStart: TextPosition?
     private var selectionAnchor: TextPosition?
