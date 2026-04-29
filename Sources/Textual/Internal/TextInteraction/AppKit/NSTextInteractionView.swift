@@ -218,6 +218,27 @@
         )
       )
 
+      // Format-specific copy options
+      let copySubmenu = NSMenu()
+      copySubmenu.addItem(.init(
+        title: "Copy as Plain Text",
+        action: #selector(copyAsPlainText(_:)),
+        keyEquivalent: ""
+      ))
+      copySubmenu.addItem(.init(
+        title: "Copy as HTML",
+        action: #selector(copyAsHTML(_:)),
+        keyEquivalent: ""
+      ))
+      copySubmenu.addItem(.init(
+        title: "Copy as Markdown",
+        action: #selector(copyAsMarkdown(_:)),
+        keyEquivalent: ""
+      ))
+      let copyAsItem = NSMenuItem(title: "Copy As…", action: nil, keyEquivalent: "")
+      copyAsItem.submenu = copySubmenu
+      contextMenu.addItem(copyAsItem)
+
       return contextMenu
     }
 
@@ -286,6 +307,31 @@
       let formatter = Formatter(attributedText)
       pasteboard.setString(formatter.plainText(), forType: .string)
       pasteboard.setString(formatter.html(), forType: .html)
+      pasteboard.setString(formatter.markdown(), forType: .init("net.daringfireball.markdown"))
+    }
+
+    @objc private func copyAsPlainText(_ sender: Any?) {
+      guard let selectedRange = model.selectedRange else { return }
+      let formatter = Formatter(model.attributedText(in: selectedRange))
+      let pasteboard = NSPasteboard.general
+      pasteboard.clearContents()
+      pasteboard.setString(formatter.plainText(), forType: .string)
+    }
+
+    @objc private func copyAsHTML(_ sender: Any?) {
+      guard let selectedRange = model.selectedRange else { return }
+      let formatter = Formatter(model.attributedText(in: selectedRange))
+      let pasteboard = NSPasteboard.general
+      pasteboard.clearContents()
+      pasteboard.setString(formatter.html(), forType: .string)
+    }
+
+    @objc private func copyAsMarkdown(_ sender: Any?) {
+      guard let selectedRange = model.selectedRange else { return }
+      let formatter = Formatter(model.attributedText(in: selectedRange))
+      let pasteboard = NSPasteboard.general
+      pasteboard.clearContents()
+      pasteboard.setString(formatter.markdown(), forType: .string)
     }
   }
 
