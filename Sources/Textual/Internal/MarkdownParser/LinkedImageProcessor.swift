@@ -4,6 +4,12 @@ import Foundation
 // images disappear entirely, and non-empty alt text keeps only the outer link. This processor
 // works around that by rewriting linked images into ordinary image Markdown before parsing, then
 // restoring the parsed image run with the outer link attached.
+//
+// During preprocessing, each linked image is replaced with a plain image whose alt text is a
+// private sentinel token, for example `[![](image.png)](link)` becomes
+// `![sentinel](image.png)`. Foundation can parse that into an image run, so restoration scans for
+// runs whose text matches a sentinel, replaces the sentinel with the original alt text or U+FFFC,
+// keeps the parsed image attributes, and sets `link` to the original outer destination.
 struct LinkedImageProcessor {
   private let baseURL: URL?
 
