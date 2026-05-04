@@ -23,14 +23,18 @@ public struct AttributedStringMarkdownParser: MarkupParser {
   }
 
   public func attributedString(for input: String) throws -> AttributedString {
-    try processor.expand(
+    let linkedImages = LinkedImageProcessor(baseURL: baseURL)
+    let preprocessed = linkedImages.preprocess(input)
+    let attributedString = try processor.expand(
       AttributedString(
-        markdown: input,
+        markdown: preprocessed.markdown,
         including: \.textual,
         options: options,
         baseURL: baseURL
       )
     )
+
+    return linkedImages.restore(attributedString, from: preprocessed)
   }
 }
 
