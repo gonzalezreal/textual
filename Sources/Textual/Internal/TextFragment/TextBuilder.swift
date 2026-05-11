@@ -96,9 +96,12 @@ extension Text {
       return text
     }
 
-    self = textValues.reduce(Text(verbatim: "")) { partialResult, text in
-      Text("\(partialResult)\(text)")
-    }
+    // Concatenate via `Text + Text` rather than `Text("\(partialResult)\(text)")`.
+    // The interpolation form produces a `LocalizedStringKey`-backed `Text` at every
+    // reduce step; resolving the resulting N-deep chain recurses ~8 stack frames per
+    // level during SwiftUI's render pass and overflows the main-thread stack for
+    // content that produces a few hundred attributed runs (e.g. emoji-dense notes).
+    self = textValues.reduce(Text(verbatim: ""), +)
   }
 
   private init(placeholderSize size: CGSize) {
