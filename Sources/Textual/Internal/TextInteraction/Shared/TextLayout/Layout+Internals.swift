@@ -16,15 +16,16 @@
         .map(\.attributedString)
         .removingIdenticalDuplicates()
 
-      // Attachment attributes are replaced by placeholders in the rendering pipeline (see TextFragment)
-      // We need to re-apply them to make them part of the contents during copy operations
+      // Attachment and inline-intent attributes are stripped or replaced in the rendering pipeline
+      // (see TextFragment). Re-apply them so downstream consumers (export formatters, etc.) see
+      // the same attributes that the source AttributedString carried.
       let attributedStrings = layoutAttributedStrings.map { input in
         // Get all the lines in the layout that reference the input
         let lines = zip(self, lineFragments)
           .filter { $1.attributedString === input }
           .map(\.0)
 
-        return input.applyingAttachments(in: lines)
+        return input.applyingPreservedAttributes(in: lines)
       }
 
       return .init(
@@ -111,8 +112,8 @@
   }
 
   extension NSAttributedString {
-    fileprivate func applyingAttachments(in lines: [Text.Layout.Line]) -> NSAttributedString {
-      guard lines.containsAttachments else {
+    fileprivate func applyingPreservedAttributes(in lines: [Text.Layout.Line]) -> NSAttributedString {
+      guard lines.hasPreservedAttributes else {
         return self
       }
 
@@ -120,16 +121,27 @@
 
       for line in lines {
         for run in line {
-          guard
-            let attachment = run.attachment,
-            let range = run.characterRanges.first
-          else { continue }
+          let characterRanges = run.characterRanges
+          guard let firstRange = characterRanges.first else { continue }
 
-          result.addAttribute(.textual.attachment, value: attachment, range: NSRange(range))
+          // Attachments are single glyphs, so the first range alone covers them.
+          if let attachment = run.attachment {
+            let nsRange = NSRange(firstRange)
+            result.addAttribute(.textual.attachment, value: attachment, range: nsRange)
+            if let presentationIntent = run.attachmentPresentationIntent {
+              result.addAttribute(
+                .textual.presentationIntent, value: presentationIntent, range: nsRange)
+            }
+          }
 
-          if let presentationIntent = run.attachmentPresentationIntent {
-            result.addAttribute(
-              .textual.presentationIntent, value: presentationIntent, range: NSRange(range))
+          // Inline intent spans the full run; cover every glyph's character range.
+          if let inlineIntent = run.inlineIntent, !inlineIntent.isEmpty {
+            for range in characterRanges {
+              result.addAttribute(
+                .textual.inlinePresentationIntent,
+                value: inlineIntent.rawValue,
+                range: NSRange(range))
+            }
           }
         }
       }
@@ -139,10 +151,10 @@
   }
 
   extension Array where Element == Text.Layout.Line {
-    fileprivate var containsAttachments: Bool {
+    fileprivate var hasPreservedAttributes: Bool {
       self.contains { line in
         line.contains { run in
-          run.attachment != nil
+          run.attachment != nil || run.inlineIntent != nil
         }
       }
     }

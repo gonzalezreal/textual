@@ -98,6 +98,9 @@
     }
 
     override func rightMouseDown(with event: NSEvent) {
+      // Become first responder so the menu items' actions are dispatched here
+      // via the responder chain rather than to a stale first responder.
+      window?.makeFirstResponder(self)
       let location = convert(event.locationInWindow, from: nil)
       updateSelectionForContextMenu(at: location)
 
@@ -105,6 +108,7 @@
     }
 
     override func menu(for event: NSEvent) -> NSMenu? {
+      window?.makeFirstResponder(self)
       let location = convert(event.locationInWindow, from: nil)
       updateSelectionForContextMenu(at: location)
 
@@ -202,39 +206,40 @@
           NSLocalizedString("Copy", bundle: .main, comment: "")
         }
 
-      contextMenu.addItem(
-        .init(
-          title: shareActionTitle,
-          action: #selector(share(_:)),
-          keyEquivalent: ""
-        )
-      )
+      let shareItem = NSMenuItem(
+        title: shareActionTitle,
+        action: #selector(share(_:)),
+        keyEquivalent: "")
+      shareItem.target = self
+      contextMenu.addItem(shareItem)
       contextMenu.addItem(.separator())
-      contextMenu.addItem(
-        .init(
-          title: copyActionTitle,
-          action: #selector(copy(_:)),
-          keyEquivalent: ""
-        )
-      )
+      let copyItem = NSMenuItem(
+        title: copyActionTitle,
+        action: #selector(copy(_:)),
+        keyEquivalent: "")
+      copyItem.target = self
+      contextMenu.addItem(copyItem)
 
       // Format-specific copy options
       let copySubmenu = NSMenu()
-      copySubmenu.addItem(.init(
+      let plainItem = NSMenuItem(
         title: "Copy as Plain Text",
         action: #selector(copyAsPlainText(_:)),
-        keyEquivalent: ""
-      ))
-      copySubmenu.addItem(.init(
+        keyEquivalent: "")
+      plainItem.target = self
+      copySubmenu.addItem(plainItem)
+      let htmlItem = NSMenuItem(
         title: "Copy as HTML",
         action: #selector(copyAsHTML(_:)),
-        keyEquivalent: ""
-      ))
-      copySubmenu.addItem(.init(
+        keyEquivalent: "")
+      htmlItem.target = self
+      copySubmenu.addItem(htmlItem)
+      let markdownItem = NSMenuItem(
         title: "Copy as Markdown",
         action: #selector(copyAsMarkdown(_:)),
-        keyEquivalent: ""
-      ))
+        keyEquivalent: "")
+      markdownItem.target = self
+      copySubmenu.addItem(markdownItem)
       let copyAsItem = NSMenuItem(title: "Copy As…", action: nil, keyEquivalent: "")
       copyAsItem.submenu = copySubmenu
       contextMenu.addItem(copyAsItem)
@@ -305,9 +310,17 @@
       pasteboard.clearContents()
 
       let formatter = Formatter(attributedText)
+
+      // RTF carries the rendered font/paragraph attributes directly and is
+      // what Word, Pages, Apple Notes, and LibreOffice prefer for rich paste.
+      if let rtfData = formatter.rtfData() {
+        pasteboard.setData(rtfData, forType: .rtf)
+      }
+
+      pasteboard.setString(formatter.htmlDocument(), forType: .html)
+      pasteboard.setString(
+        formatter.markdown(), forType: .init("net.daringfireball.markdown"))
       pasteboard.setString(formatter.plainText(), forType: .string)
-      pasteboard.setString(formatter.html(), forType: .html)
-      pasteboard.setString(formatter.markdown(), forType: .init("net.daringfireball.markdown"))
     }
 
     @objc private func copyAsPlainText(_ sender: Any?) {
@@ -320,10 +333,23 @@
 
     @objc private func copyAsHTML(_ sender: Any?) {
       guard let selectedRange = model.selectedRange else { return }
-      let formatter = Formatter(model.attributedText(in: selectedRange))
+      let attributedText = model.attributedText(in: selectedRange)
+      let formatter = Formatter(attributedText)
       let pasteboard = NSPasteboard.general
       pasteboard.clearContents()
-      pasteboard.setString(formatter.html(), forType: .string)
+
+      // RTF first: word processors pick the richest type they recognize, and
+      // RTF (built from the rendered NSAttributedString) preserves bold,
+      // bullets, indentation, and font more reliably than a bare HTML fragment.
+      if let rtfData = formatter.rtfData() {
+        pasteboard.setData(rtfData, forType: .rtf)
+      }
+
+      // HTML as a complete document for apps that prefer HTML.
+      pasteboard.setString(formatter.htmlDocument(), forType: .html)
+
+      // Plain-text fallback so plain targets get something readable.
+      pasteboard.setString(formatter.plainText(), forType: .string)
     }
 
     @objc private func copyAsMarkdown(_ sender: Any?) {
@@ -331,7 +357,11 @@
       let formatter = Formatter(model.attributedText(in: selectedRange))
       let pasteboard = NSPasteboard.general
       pasteboard.clearContents()
-      pasteboard.setString(formatter.markdown(), forType: .string)
+      // Declare the Markdown UTI for Markdown-aware editors and provide the
+      // raw markdown as plain text so other targets get the source string.
+      let markdown = formatter.markdown()
+      pasteboard.setString(markdown, forType: .init("net.daringfireball.markdown"))
+      pasteboard.setString(markdown, forType: .string)
     }
   }
 

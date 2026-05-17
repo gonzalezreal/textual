@@ -93,6 +93,13 @@ extension Text {
         text = text.customAttribute(LinkAttribute(link))
       }
 
+      // Preserve inline emphasis (strong/em/strikethrough/code) for export.
+      // SwiftUI strips `NSInlinePresentationIntent` during rendering, so we
+      // round-trip it as a SwiftUI `TextAttribute` and re-apply it later.
+      if let intent = run.inlinePresentationIntent, !intent.isEmpty {
+        text = text.customAttribute(InlineIntentAttribute(intent))
+      }
+
       return text
     }
 

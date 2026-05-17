@@ -163,4 +163,8 @@ extension TextualNamespace where Base == NSAttributedString.Key {
   static var presentationIntent: Base {
     .init(AttributeScopes.FoundationAttributes.PresentationIntentAttribute.name)
   }
+
+  static var inlinePresentationIntent: Base {
+    .init(AttributeScopes.FoundationAttributes.InlinePresentationIntentAttribute.name)
+  }
 }

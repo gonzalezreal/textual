@@ -4,6 +4,20 @@ extension Formatter {
   func html() -> String {
     blockNodes.renderHTML()
   }
+
+  /// Wrap the HTML fragment in a minimal document. Some receivers (LibreOffice
+  /// in particular) render fragments inconsistently without `<html>`/`<body>`.
+  func htmlDocument() -> String {
+    """
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="UTF-8"></head>
+    <body>
+    \(html())
+    </body>
+    </html>
+    """
+  }
 }
 
 // MARK: - Inline rendering
