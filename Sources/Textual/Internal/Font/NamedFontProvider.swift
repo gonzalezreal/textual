@@ -9,7 +9,7 @@ struct NamedFontProvider {
 
 extension NamedFontProvider: FontProvider {
   func size(in environment: TextEnvironmentValues) -> CGFloat {
-    #if canImport(AppKit)
+    #if canImport(AppKit) && !targetEnvironment(macCatalyst)
       return size * scale
     #elseif canImport(UIKit)
       guard let textStyle else { return size * scale }
