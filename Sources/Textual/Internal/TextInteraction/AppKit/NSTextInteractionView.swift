@@ -17,6 +17,7 @@
 
     override var acceptsFirstResponder: Bool { true }
     override var isFlipped: Bool { true }
+    override var mouseDownCanMoveWindow: Bool { false }
 
     private var dragStart: TextPosition?
     private var selectionAnchor: TextPosition?
