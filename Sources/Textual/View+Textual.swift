@@ -182,7 +182,6 @@ extension TextualNamespace where Base: View {
   ///
   /// Pair with ``Overflow`` for scrollable code blocks. Apply to any interactive
   /// chrome rendered inside a ``StructuredText`` style.
-  @inlinable
   public func interactiveExclusionRegion() -> some View {
     base.background(
       GeometryReader { geometry in
