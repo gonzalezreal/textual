@@ -10,11 +10,6 @@ extension StructuredText {
       self.content = content
     }
 
-    /// Plain-text source of the code block (syntax highlighting attributes stripped).
-    public var source: String {
-      String(content.characters)
-    }
-
     /// Copies the code block contents to the system pasteboard.
     ///
     /// Textual writes both a plain-text and an HTML representation when possible.
