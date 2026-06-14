@@ -1,4 +1,4 @@
-#if os(iOS)
+#if os(iOS) && !targetEnvironment(macCatalyst)
   import SwiftUI
   import Testing
   import SnapshotTesting
@@ -29,7 +29,7 @@
         )
         .background(Color.guide)
         .padding(.horizontal)
-        assertSnapshot(of: view, as: .image(layout: layout))
+        assertSnapshot(of: view, as: .textualImage(layout: layout))
       }
 
       @Test func inlines() {
@@ -43,7 +43,7 @@
         )
         .background(Color.guide)
         .padding(.horizontal)
-        assertSnapshot(of: view, as: .image(layout: layout))
+        assertSnapshot(of: view, as: .textualImage(layout: layout))
       }
     }
   }

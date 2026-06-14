@@ -1,4 +1,4 @@
-#if os(iOS)
+#if os(iOS) && !targetEnvironment(macCatalyst)
   import SwiftUI
   import Testing
   import SnapshotTesting
@@ -59,7 +59,7 @@
         .padding(.horizontal)
         .textual.orderedListMarker(.lowerRoman)
 
-        assertSnapshot(of: view, as: .image(layout: layout))
+        assertSnapshot(of: view, as: .textualImage(layout: layout))
       }
 
       @Test func upperRomanList() {
@@ -81,7 +81,7 @@
         .padding(.horizontal)
         .textual.orderedListMarker(.upperRoman)
 
-        assertSnapshot(of: view, as: .image(layout: layout))
+        assertSnapshot(of: view, as: .textualImage(layout: layout))
       }
 
       @Test func lowerAlphaList() {
@@ -103,7 +103,7 @@
         .padding(.horizontal)
         .textual.orderedListMarker(.lowerAlpha)
 
-        assertSnapshot(of: view, as: .image(layout: layout))
+        assertSnapshot(of: view, as: .textualImage(layout: layout))
       }
 
       @Test func upperAlphaList() {
@@ -125,7 +125,7 @@
         .padding(.horizontal)
         .textual.orderedListMarker(.upperAlpha)
 
-        assertSnapshot(of: view, as: .image(layout: layout))
+        assertSnapshot(of: view, as: .textualImage(layout: layout))
       }
     }
   }

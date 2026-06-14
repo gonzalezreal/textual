@@ -97,7 +97,7 @@ extension Text {
     }
 
     self = textValues.reduce(Text(verbatim: "")) { partialResult, text in
-      Text("\(partialResult)\(text)")
+      partialResult + text
     }
   }
 
