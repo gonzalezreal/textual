@@ -26,7 +26,7 @@
         .background(Color.guide)
         .padding(.horizontal)
 
-        assertSnapshot(of: view, as: .image(layout: layout))
+        assertSnapshot(of: view, as: .textualImage(layout: layout))
       }
 
       @Test func mathBlockAlignment() {
@@ -45,7 +45,7 @@
         .multilineTextAlignment(.leading)
         .textual.mathProperties(.init(textAlignment: .trailing))
 
-        assertSnapshot(of: view, as: .image(layout: layout))
+        assertSnapshot(of: view, as: .textualImage(layout: layout))
       }
     }
   }

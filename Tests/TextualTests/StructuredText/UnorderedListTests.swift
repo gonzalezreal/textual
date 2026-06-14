@@ -25,7 +25,7 @@
         .padding(.horizontal)
         .textual.unorderedListMarker(.hierarchical(.disc, .circle, .square))
 
-        assertSnapshot(of: view, as: .image(layout: layout))
+        assertSnapshot(of: view, as: .textualImage(layout: layout))
       }
 
       @Test func dashList() {
@@ -43,7 +43,7 @@
         .padding(.horizontal)
         .textual.unorderedListMarker(.dash)
 
-        assertSnapshot(of: view, as: .image(layout: layout))
+        assertSnapshot(of: view, as: .textualImage(layout: layout))
       }
     }
   }

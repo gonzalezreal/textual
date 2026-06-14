@@ -29,7 +29,7 @@
         )
         .padding(.horizontal)
 
-        assertSnapshot(of: view, as: .image(layout: layout))
+        assertSnapshot(of: view, as: .textualImage(layout: layout))
       }
     }
   }
