@@ -16,7 +16,7 @@ extension StructuredText {
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public func copyToPasteboard() {
-      #if TEXTUAL_ENABLE_TEXT_SELECTION && canImport(AppKit)
+      #if TEXTUAL_ENABLE_TEXT_SELECTION && canImport(AppKit) && !targetEnvironment(macCatalyst)
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
 

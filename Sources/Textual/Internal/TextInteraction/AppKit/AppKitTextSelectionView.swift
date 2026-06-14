@@ -1,4 +1,4 @@
-#if TEXTUAL_ENABLE_TEXT_SELECTION && canImport(AppKit)
+#if TEXTUAL_ENABLE_TEXT_SELECTION && canImport(AppKit) && !targetEnvironment(macCatalyst)
   import SwiftUI
 
   // MARK: - Overview

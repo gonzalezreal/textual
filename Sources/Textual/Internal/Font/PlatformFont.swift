@@ -7,7 +7,7 @@ import SwiftUI
 // UITraitCollection, ensuring font descriptors reflect the same Dynamic Type and Bold Text
 // settings as the SwiftUI environment.
 
-#if canImport(AppKit)
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
   typealias PlatformFont = NSFont
   typealias FontDescriptor = NSFontDescriptor
 #elseif canImport(UIKit)
@@ -20,7 +20,7 @@ extension FontDescriptor {
     withTextStyle style: Font.TextStyle,
     in environment: TextEnvironmentValues
   ) -> FontDescriptor {
-    #if canImport(AppKit)
+    #if canImport(AppKit) && !targetEnvironment(macCatalyst)
       preferredFontDescriptor(forTextStyle: .init(style))
     #elseif canImport(UIKit) && !os(watchOS)
       preferredFontDescriptor(
