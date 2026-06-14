@@ -17,7 +17,7 @@
     }
   }
 
-  #if os(iOS)
+  #if os(iOS) && !targetEnvironment(macCatalyst)
     extension TextSelectionModel {
       @MainActor static func recordFixture<Content: View>(
         for content: Content,

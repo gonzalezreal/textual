@@ -10,17 +10,22 @@ VISIONOS_SIMULATOR = $(call udid_for,$(VISIONOS_DEVICE))
 
 PLATFORM_IOS = iOS Simulator,id=$(IOS_SIMULATOR)
 PLATFORM_MACOS = macOS
+PLATFORM_MAC_CATALYST = macOS,variant=Mac Catalyst
 PLATFORM_TVOS = tvOS Simulator,id=$(TVOS_SIMULATOR)
 PLATFORM_WATCHOS = watchOS Simulator,id=$(WATCHOS_SIMULATOR)
 PLATFORM_VISIONOS = visionOS Simulator,id=$(VISIONOS_SIMULATOR)
 
 default: test
 
-test: test-macos test-ios test-tvos test-watchos test-visionos
+test: test-macos test-maccatalyst test-ios test-tvos test-watchos test-visionos
 
 test-macos:
 	@echo "Testing macOS..."
 	xcodebuild test -scheme Textual -destination platform="$(PLATFORM_MACOS)"
+
+test-maccatalyst:
+	@echo "Testing Mac Catalyst..."
+	xcodebuild test -scheme Textual -destination platform="$(PLATFORM_MAC_CATALYST)"
 
 test-ios:
 	@echo "Testing iOS..."
@@ -60,7 +65,7 @@ build-demo:
 	@echo "Building TextualDemo for macOS..."
 	xcodebuild build -workspace Textual.xcworkspace -scheme TextualDemo -destination platform="$(PLATFORM_MACOS)" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 
-.PHONY: format test bundle-prism build-demo
+.PHONY: format test test-macos test-maccatalyst test-ios test-tvos test-watchos test-visionos bundle-prism build-demo
 
 define udid_for
 $(shell xcrun simctl list --json devices available '$(1)' | jq -r '[.devices | to_entries | sort_by(.key) | reverse | .[].value | select(length > 0) | .[0]][0].udid // empty')

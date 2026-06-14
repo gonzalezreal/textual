@@ -1,4 +1,4 @@
-#if TEXTUAL_ENABLE_TEXT_SELECTION
+#if TEXTUAL_ENABLE_TEXT_SELECTION && !targetEnvironment(macCatalyst)
   import Foundation
   import SwiftUI
   import Testing
