@@ -137,11 +137,56 @@
         popover.sourceRect = rect
       }
 
-      if let windowScene = window?.windowScene,
-        let viewController = windowScene.windows.first?.rootViewController
-      {
-        viewController.present(activityViewController, animated: true)
+      if let presenter = topMostPresentingViewController() {
+        presenter.present(activityViewController, animated: true)
       }
+    }
+
+    private func topMostPresentingViewController() -> UIViewController? {
+      let windowCandidates: [UIWindow]
+      if let windowScene = window?.windowScene {
+        windowCandidates = windowScene.windows
+      } else {
+        windowCandidates = UIApplication.shared.connectedScenes
+          .compactMap { $0 as? UIWindowScene }
+          .flatMap(\.windows)
+      }
+
+      let sortedWindows = windowCandidates.sorted { lhs, rhs in
+        if lhs.isKeyWindow != rhs.isKeyWindow {
+          return lhs.isKeyWindow && !rhs.isKeyWindow
+        }
+        return lhs.windowLevel.rawValue > rhs.windowLevel.rawValue
+      }
+
+      for window in sortedWindows {
+        guard let rootViewController = window.rootViewController else { continue }
+        if let presenter = topMostViewController(startingAt: rootViewController) {
+          return presenter
+        }
+      }
+
+      return nil
+    }
+
+    private func topMostViewController(startingAt viewController: UIViewController) -> UIViewController? {
+      if let tabBarController = viewController as? UITabBarController,
+        let selectedViewController = tabBarController.selectedViewController
+      {
+        return topMostViewController(startingAt: selectedViewController)
+      }
+
+      if let navigationController = viewController as? UINavigationController,
+        let visibleViewController = navigationController.visibleViewController
+      {
+        return topMostViewController(startingAt: visibleViewController)
+      }
+
+      if let presentedViewController = viewController.presentedViewController {
+        return topMostViewController(startingAt: presentedViewController)
+      }
+
+      return viewController
     }
   }
 
