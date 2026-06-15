@@ -60,11 +60,18 @@
         return
       }
 
-      // Try to reconcile the selected text range
-      self.selectedRange = layoutCollection.reconcileRange(
+      // Try to reconcile the selected text range. Only write when it actually
+      // changes: as the overlay's GeometryReader/preferences converge, this runs
+      // several times per frame with the same result, and a redundant write to the
+      // observed `selectedRange` is what SwiftUI flags as "onChange(of:
+      // AnyTextLayoutCollection) action tried to update multiple times per frame".
+      let reconciled = layoutCollection.reconcileRange(
         selectedRange,
         from: oldLayoutCollection
       )
+      if reconciled != self.selectedRange {
+        self.selectedRange = reconciled
+      }
     }
 
     func setCoordinator(_ coordinator: TextSelectionCoordinator?) {

@@ -11,7 +11,6 @@
 
   struct AppKitTextSelectionView: View {
     @Environment(TextSelectionModel.self) private var textSelectionModel: TextSelectionModel?
-    @State private var selectionRects: [TextSelectionRect] = []
 
     private let layout: Text.Layout
     private let origin: CGPoint
@@ -22,7 +21,8 @@
     }
 
     var body: some View {
-      Group {
+      let selectionRects = self.selectionRects
+      return Group {
         if selectionRects.isEmpty {
           Color.clear
         } else {
@@ -37,18 +37,22 @@
           }
         }
       }
-      .onChange(of: textSelectionModel?.selectedRange, initial: true, updateSelectionRects)
-      .onChange(of: layout, initial: true, updateSelectionRects)
     }
 
-    private func updateSelectionRects() {
-      if let textSelectionModel,
-        let selectedRange = textSelectionModel.selectedRange
-      {
-        selectionRects = textSelectionModel.selectionRects(for: selectedRange, layout: layout)
-      } else {
-        selectionRects = []
+    /// Selection rectangles for the current range within this layout.
+    ///
+    /// Derived in `body` rather than stored in `@State` and seeded from an
+    /// `onChange(initial: true)`: that initial action wrote state during the first
+    /// view update, which SwiftUI flags ("Modifying state during view update", and
+    /// previously "tried to update multiple times per frame" when both the
+    /// `selectedRange` and `layout` handlers fired on the same frame). As an
+    /// `@Observable`-tracked computation it still recomputes whenever the selected
+    /// range or `layout` changes, with no state mutation.
+    private var selectionRects: [TextSelectionRect] {
+      guard let textSelectionModel, let selectedRange = textSelectionModel.selectedRange else {
+        return []
       }
+      return textSelectionModel.selectionRects(for: selectedRange, layout: layout)
     }
   }
 #endif
