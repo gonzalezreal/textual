@@ -56,7 +56,22 @@ public protocol AttachmentLoader: Sendable {
   ) async throws -> Attachment
 }
 
+private struct ImageAttachmentLoaderKey: EnvironmentKey {
+  nonisolated(unsafe) static let defaultValue: any AttachmentLoader = .image()
+}
+
+private struct EmojiAttachmentLoaderKey: EnvironmentKey {
+  nonisolated(unsafe) static let defaultValue: any AttachmentLoader = .emoji()
+}
+
 extension EnvironmentValues {
-  @Entry var imageAttachmentLoader: any AttachmentLoader = .image()
-  @Entry var emojiAttachmentLoader: any AttachmentLoader = .emoji()
+  var imageAttachmentLoader: any AttachmentLoader {
+    get { self[ImageAttachmentLoaderKey.self] }
+    set { self[ImageAttachmentLoaderKey.self] = newValue }
+  }
+
+  var emojiAttachmentLoader: any AttachmentLoader {
+    get { self[EmojiAttachmentLoaderKey.self] }
+    set { self[EmojiAttachmentLoaderKey.self] = newValue }
+  }
 }

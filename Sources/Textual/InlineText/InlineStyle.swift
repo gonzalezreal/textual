@@ -77,7 +77,14 @@ public struct InlineStyle: Sendable, Hashable {
   }
 }
 
+private struct InlineStyleKey: EnvironmentKey {
+  nonisolated(unsafe) static let defaultValue: InlineStyle = .default
+}
+
 extension EnvironmentValues {
   @usableFromInline
-  @Entry var inlineStyle: InlineStyle = .default
+  var inlineStyle: InlineStyle {
+    get { self[InlineStyleKey.self] }
+    set { self[InlineStyleKey.self] = newValue }
+  }
 }

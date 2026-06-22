@@ -9,6 +9,7 @@
   // `TextSelectionModel` from the environment, computes selection rectangles for the current
   // range within this layout, and paints them in a `Canvas` behind the text.
 
+  @available(macOS 15, *)
   struct AppKitTextSelectionView: View {
     @Environment(TextSelectionModel.self) private var textSelectionModel: TextSelectionModel?
     @State private var selectionRects: [TextSelectionRect] = []

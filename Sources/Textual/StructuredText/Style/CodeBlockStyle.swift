@@ -37,7 +37,14 @@ extension StructuredText {
   }
 }
 
+private struct CodeBlockStyleKey: EnvironmentKey {
+  nonisolated(unsafe) static let defaultValue: any StructuredText.CodeBlockStyle = .default
+}
+
 extension EnvironmentValues {
   @usableFromInline
-  @Entry var codeBlockStyle: any StructuredText.CodeBlockStyle = .default
+  var codeBlockStyle: any StructuredText.CodeBlockStyle {
+    get { self[CodeBlockStyleKey.self] }
+    set { self[CodeBlockStyleKey.self] = newValue }
+  }
 }

@@ -78,19 +78,23 @@ extension Text {
         // Create placeholder
         text = Text(placeholderSize: size)
           .baselineOffset(key.attachment.baselineOffset(in: runEnvironment))
-          .customAttribute(
+        if #available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *) {
+          text = text.customAttribute(
             AttachmentAttribute(
               key.attachment,
               presentationIntent: run.presentationIntent
             )
           )
+        }
       } else {
         text = Text(AttributedString(attributedString[run.range]))
       }
 
       // Add link attribute for TextLinkInteraction
       if let link = run.link {
-        text = text.customAttribute(LinkAttribute(link))
+        if #available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *) {
+          text = text.customAttribute(LinkAttribute(link))
+        }
       }
 
       return text

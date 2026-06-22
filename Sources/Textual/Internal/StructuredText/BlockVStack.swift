@@ -20,7 +20,7 @@ extension StructuredText {
     }
 
     var body: some View {
-      Group(subviews: content) { children in
+      SubviewGroup(subviews: content) { children in
         BlockVStackLayout(textAlignment: textAlignment) {
           ForEach(children) {
             BlockLayoutView($0)
@@ -53,7 +53,8 @@ extension StructuredText {
       content
         .onPreferenceChange(BlockSpacingKey.self) { @MainActor value in
           // Override with the resolved list item spacing if enabled
-          blockSpacing = listItemSpacingEnabled ? resolvedListItemSpacing : value
+          blockSpacing =
+            listItemSpacingEnabled ? resolvedListItemSpacing : value
         }
         .layoutValue(key: BlockSpacingKey.self, value: blockSpacing)
     }
@@ -83,7 +84,8 @@ extension StructuredText {
 
     func sizeThatFits(
       proposal: ProposedViewSize,
-      subviews: Subviews, cache: inout Cache
+      subviews: Subviews,
+      cache: inout Cache
     ) -> CGSize {
       if let width = proposal.width, width <= 0 {
         return .zero
@@ -92,7 +94,9 @@ extension StructuredText {
       var size = CGSize.zero
 
       for view in subviews {
-        let viewSize = view.sizeThatFits(.init(width: proposal.width, height: nil))
+        let viewSize = view.sizeThatFits(
+          .init(width: proposal.width, height: nil)
+        )
         size.height += viewSize.height
         size.width = max(size.width, viewSize.width)
       }
@@ -105,7 +109,8 @@ extension StructuredText {
     func placeSubviews(
       in bounds: CGRect,
       proposal: ProposedViewSize,
-      subviews: Subviews, cache: inout Cache
+      subviews: Subviews,
+      cache: inout Cache
     ) {
       var currentY: CGFloat = 0
 

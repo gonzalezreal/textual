@@ -10,6 +10,7 @@
   // manages selection gestures, keyboard-driven updates, and context menus while SwiftUI renders
   // the text.
 
+  @available(macOS 15, *)
   struct AppKitTextInteractionOverlay: NSViewRepresentable {
     private let model: TextSelectionModel
     private let overflowFrames: [CGRect]

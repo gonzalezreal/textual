@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Controls how content behaves when it overflows horizontally.
-public enum OverflowMode: Hashable {
+public enum OverflowMode: Hashable, Sendable {
   /// Wraps content to fit the available width.
   case wrap
   /// Allows horizontal scrolling.
@@ -71,14 +71,10 @@ public struct Overflow<Content: View>: View {
             }
             // Make text selection local in scrollable regions
             .modifier(TextSelectionInteraction())
-            .transformPreference(Text.LayoutKey.self) { value in
-              value = []
-            }
+            .modifier(SuppressTextLayoutPreferenceModifier())
         }
       }
-      .onScrollGeometryChange(for: CGFloat.self, of: \.containerSize.width) {
-        containerWidth = $1
-      }
+      .modifier(ScrollContainerWidthModifier(containerWidth: $containerWidth))
       // Propagate gesture exclusion area
       .background(
         GeometryReader { geometry in
@@ -93,7 +89,47 @@ public struct Overflow<Content: View>: View {
   }
 }
 
+private struct OverflowModeKey: EnvironmentKey {
+  static let defaultValue: OverflowMode = .scroll
+}
+
+private struct ScrollContainerWidthModifier: ViewModifier {
+  @Binding var containerWidth: CGFloat?
+
+  func body(content: Content) -> some View {
+    if #available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *) {
+      content.onScrollGeometryChange(for: CGFloat.self, of: \.containerSize.width) {
+        containerWidth = $1
+      }
+    } else {
+      content
+    }
+  }
+}
+
+private struct SuppressTextLayoutPreferenceModifier: ViewModifier {
+  func body(content: Content) -> some View {
+    if #available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *) {
+      content.modifier(SuppressTextLayoutPreferenceModifierBody())
+    } else {
+      content
+    }
+  }
+}
+
+@available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
+private struct SuppressTextLayoutPreferenceModifierBody: ViewModifier {
+  func body(content: Content) -> some View {
+    content.transformPreference(Text.LayoutKey.self) { value in
+      value = []
+    }
+  }
+}
+
 extension EnvironmentValues {
   @usableFromInline
-  @Entry var overflowMode = OverflowMode.scroll
+  var overflowMode: OverflowMode {
+    get { self[OverflowModeKey.self] }
+    set { self[OverflowModeKey.self] = newValue }
+  }
 }

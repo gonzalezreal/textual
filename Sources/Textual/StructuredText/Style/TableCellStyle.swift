@@ -35,7 +35,14 @@ extension StructuredText {
   }
 }
 
+private struct TableCellStyleKey: EnvironmentKey {
+  nonisolated(unsafe) static let defaultValue: any StructuredText.TableCellStyle = .default
+}
+
 extension EnvironmentValues {
   @usableFromInline
-  @Entry var tableCellStyle: any StructuredText.TableCellStyle = .default
+  var tableCellStyle: any StructuredText.TableCellStyle {
+    get { self[TableCellStyleKey.self] }
+    set { self[TableCellStyleKey.self] = newValue }
+  }
 }

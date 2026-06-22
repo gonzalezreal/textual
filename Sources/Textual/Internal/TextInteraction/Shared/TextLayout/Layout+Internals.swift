@@ -2,6 +2,7 @@
   import CoreText
   import SwiftUI
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   extension Text.Layout {
     struct Contents {
       let lineFragments: [NSTextLineFragment]
@@ -35,6 +36,7 @@
     }
   }
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   extension Text.Layout.Line {
     var lineFragment: NSTextLineFragment? {
       let mirror = Mirror(reflecting: self)
@@ -47,6 +49,7 @@
     }
   }
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   extension Text.Layout.Run {
     var characterRanges: [Range<Int>] {
       guard let ctRun else { return [] }
@@ -110,6 +113,7 @@
     }
   }
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   extension NSAttributedString {
     fileprivate func applyingAttachments(in lines: [Text.Layout.Line]) -> NSAttributedString {
       guard lines.containsAttachments else {
@@ -138,6 +142,7 @@
     }
   }
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   extension Array where Element == Text.Layout.Line {
     fileprivate var containsAttachments: Bool {
       self.contains { line in

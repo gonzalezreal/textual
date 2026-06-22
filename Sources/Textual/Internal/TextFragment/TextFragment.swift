@@ -36,8 +36,7 @@ struct TextFragment<Content: AttributedStringProtocol>: View {
   }
 
   var body: some View {
-    text
-      .customAttribute(TextFragmentAttribute())
+    taggedText
       .onGeometryChange(for: CGSize?.self, of: \.textContainerSize) { size in
         guard let size, let textBuilder else { return }
         textBuilder.sizeChanged(size, environment: textEnvironment)
@@ -50,14 +49,23 @@ struct TextFragment<Content: AttributedStringProtocol>: View {
       .modifier(TextLinkInteraction())
   }
 
+  @ViewBuilder private var taggedText: some View {
+    if #available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *) {
+      text.customAttribute(TextFragmentAttribute())
+    } else {
+      text
+    }
+  }
+
   private var text: Text {
     textBuilder?.text ?? Text(verbatim: "")
   }
 }
 
-struct TextFragmentAttribute: TextAttribute {
-}
+@available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
+struct TextFragmentAttribute: TextAttribute {}
 
+@available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
 extension Text.Layout {
   var isTextFragment: Bool {
     first?.first?[TextFragmentAttribute.self] != nil

@@ -15,7 +15,14 @@ extension StructuredText {
   }
 }
 
+private struct ParagraphStyleKey: EnvironmentKey {
+  nonisolated(unsafe) static let defaultValue: any StructuredText.ParagraphStyle = .default
+}
+
 extension EnvironmentValues {
   @usableFromInline
-  @Entry var paragraphStyle: any StructuredText.ParagraphStyle = .default
+  var paragraphStyle: any StructuredText.ParagraphStyle {
+    get { self[ParagraphStyleKey.self] }
+    set { self[ParagraphStyleKey.self] = newValue }
+  }
 }

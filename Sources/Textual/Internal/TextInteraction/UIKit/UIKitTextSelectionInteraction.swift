@@ -10,8 +10,10 @@
   // integrates with system edit actions (copy/share). SwiftUI continues to render the text while
   // UIKit manages the selection interaction.
 
-  typealias PlatformTextSelectionInteraction = UIKitTextSelectionInteraction
+@available(iOS 18, *)
+typealias PlatformTextSelectionInteraction = UIKitTextSelectionInteraction
 
+  @available(iOS 18, *)
   struct UIKitTextSelectionInteraction: ViewModifier {
     private let model: TextSelectionModel
 
