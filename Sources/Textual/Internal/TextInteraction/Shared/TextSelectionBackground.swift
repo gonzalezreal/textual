@@ -11,17 +11,21 @@ import SwiftUI
 struct TextSelectionBackground: ViewModifier {
   func body(content: Content) -> some View {
     #if TEXTUAL_ENABLE_TEXT_SELECTION && canImport(AppKit) && !targetEnvironment(macCatalyst)
-      content
-        .backgroundPreferenceValue(Text.LayoutKey.self) { value in
-          if let anchoredLayout = value.first {
-            GeometryReader { geometry in
-              AppKitTextSelectionView(
-                layout: anchoredLayout.layout,
-                origin: geometry[anchoredLayout.origin]
-              )
+      if #available(macOS 15, *) {
+        content
+          .backgroundPreferenceValue(Text.LayoutKey.self) { value in
+            if let anchoredLayout = value.first {
+              GeometryReader { geometry in
+                AppKitTextSelectionView(
+                  layout: anchoredLayout.layout,
+                  origin: geometry[anchoredLayout.origin]
+                )
+              }
             }
           }
-        }
+      } else {
+        content
+      }
     #else
       content
     #endif

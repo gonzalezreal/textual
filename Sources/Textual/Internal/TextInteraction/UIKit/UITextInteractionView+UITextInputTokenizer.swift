@@ -13,6 +13,7 @@
   // By clamping word and sentence operations to the current block range reported by the model, the
   // selection behavior matches the document’s structure.
 
+  @available(iOS 18, *)
   extension UITextInteractionView: UITextInputTokenizer {
     func rangeEnclosingPosition(
       _ position: UITextPosition,

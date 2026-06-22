@@ -21,9 +21,16 @@ extension StructuredText {
   }
 }
 
+private struct UnorderedListMarkerKey: EnvironmentKey {
+  nonisolated(unsafe) static let defaultValue: any StructuredText.UnorderedListMarker = .disc
+}
+
 extension EnvironmentValues {
   @usableFromInline
-  @Entry var unorderedListMarker: any StructuredText.UnorderedListMarker = .disc
+  var unorderedListMarker: any StructuredText.UnorderedListMarker {
+    get { self[UnorderedListMarkerKey.self] }
+    set { self[UnorderedListMarkerKey.self] = newValue }
+  }
 }
 
 // MARK: - Symbol

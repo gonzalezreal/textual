@@ -10,6 +10,7 @@
   // a `UITextInteraction` configured for selection and implements the `UITextInput` surface that
   // UIKit uses for selection behavior.
 
+  @available(iOS 18, *)
   struct UIKitTextInteractionOverlay: UIViewRepresentable {
     private let model: TextSelectionModel
     private let overflowFrames: [CGRect]

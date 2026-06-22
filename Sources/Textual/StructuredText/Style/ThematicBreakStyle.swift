@@ -15,7 +15,14 @@ extension StructuredText {
   }
 }
 
+private struct ThematicBreakStyleKey: EnvironmentKey {
+  nonisolated(unsafe) static let defaultValue: any StructuredText.ThematicBreakStyle = .divider
+}
+
 extension EnvironmentValues {
   @usableFromInline
-  @Entry var thematicBreakStyle: any StructuredText.ThematicBreakStyle = .divider
+  var thematicBreakStyle: any StructuredText.ThematicBreakStyle {
+    get { self[ThematicBreakStyleKey.self] }
+    set { self[ThematicBreakStyleKey.self] = newValue }
+  }
 }

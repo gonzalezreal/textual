@@ -1,6 +1,7 @@
 #if TEXTUAL_ENABLE_TEXT_SELECTION && canImport(UIKit)
   import UIKit
 
+  @available(iOS 18, *)
   final class TextSelectionRectBox: UITextSelectionRect {
     private let wrappedValue: TextSelectionRect
 

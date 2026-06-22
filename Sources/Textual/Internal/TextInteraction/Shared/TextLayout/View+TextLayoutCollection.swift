@@ -10,6 +10,7 @@
   // concrete origins. Platform interactions and selection rendering use the collection for hit
   // testing, position mapping, and selection rectangle computation.
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   extension View {
     func overlayTextLayoutCollection(
       @ViewBuilder content: @escaping (any TextLayoutCollection) -> some View

@@ -12,15 +12,28 @@ import SwiftUI
 // remain independent.
 
 struct TextSelectionInteraction: ViewModifier {
-  #if TEXTUAL_ENABLE_TEXT_SELECTION
+  func body(content: Content) -> some View {
+    #if TEXTUAL_ENABLE_TEXT_SELECTION
+      if #available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *) {
+        content.modifier(TextSelectionInteractionBody())
+      } else {
+        content
+      }
+    #else
+      content
+    #endif
+  }
+}
+
+#if TEXTUAL_ENABLE_TEXT_SELECTION
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
+  private struct TextSelectionInteractionBody: ViewModifier {
     @Environment(\.textSelection) private var textSelection
     @Environment(TextSelectionCoordinator.self) private var coordinator: TextSelectionCoordinator?
 
     @State private var model = TextSelectionModel()
-  #endif
 
-  func body(content: Content) -> some View {
-    #if TEXTUAL_ENABLE_TEXT_SELECTION
+    func body(content: Content) -> some View {
       if textSelection.allowsSelection {
         content
           .overlayTextLayoutCollection { layoutCollection in
@@ -34,17 +47,20 @@ struct TextSelectionInteraction: ViewModifier {
       } else {
         content
       }
-    #else
-      content
-    #endif
+    }
   }
-}
 
-#if TEXTUAL_ENABLE_TEXT_SELECTION
+  private struct TextSelectionKey: EnvironmentKey {
+    nonisolated(unsafe) static let defaultValue: any TextSelectability.Type = DisabledTextSelectability.self
+  }
+
   extension EnvironmentValues {
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     @usableFromInline
-    @Entry var textSelection: any TextSelectability.Type = DisabledTextSelectability.self
+    var textSelection: any TextSelectability.Type {
+      get { self[TextSelectionKey.self] }
+      set { self[TextSelectionKey.self] = newValue }
+    }
   }
 #endif

@@ -1,6 +1,7 @@
 #if TEXTUAL_ENABLE_TEXT_SELECTION && canImport(UIKit)
   import SwiftUI
 
+  @available(iOS 18, *)
   extension UITextInteractionView: UITextInput {
     var hasText: Bool {
       model.hasText

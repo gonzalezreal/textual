@@ -13,6 +13,7 @@ import SwiftUI
 // `Text.Layout.Run` exposes lightweight accessors so overlay code can discover attachments without
 // reaching back into the original attributed string.
 
+@available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
 struct AttachmentAttribute: TextAttribute {
   var attachment: AnyAttachment
   var presentationIntent: PresentationIntent?
@@ -23,6 +24,7 @@ struct AttachmentAttribute: TextAttribute {
   }
 }
 
+@available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
 extension Text.Layout.Run {
   var attachment: AnyAttachment? {
     self[AttachmentAttribute.self]?.attachment

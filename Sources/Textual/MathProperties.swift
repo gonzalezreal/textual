@@ -50,6 +50,13 @@ extension MathProperties.FontName {
   public static let leteSans: Self = .init(rawValue: Math.Font.Name.leteSans.rawValue)
 }
 
+private struct MathPropertiesKey: EnvironmentKey {
+  static let defaultValue = MathProperties()
+}
+
 extension EnvironmentValues {
-  @Entry var mathProperties = MathProperties()
+  var mathProperties: MathProperties {
+    get { self[MathPropertiesKey.self] }
+    set { self[MathPropertiesKey.self] = newValue }
+  }
 }

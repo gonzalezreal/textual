@@ -31,7 +31,14 @@ extension StructuredText {
   }
 }
 
+private struct HighlighterThemeKey: EnvironmentKey {
+  static let defaultValue: StructuredText.HighlighterTheme = .default
+}
+
 extension EnvironmentValues {
   @usableFromInline
-  @Entry var highlighterTheme: StructuredText.HighlighterTheme = .default
+  var highlighterTheme: StructuredText.HighlighterTheme {
+    get { self[HighlighterThemeKey.self] }
+    set { self[HighlighterThemeKey.self] = newValue }
+  }
 }

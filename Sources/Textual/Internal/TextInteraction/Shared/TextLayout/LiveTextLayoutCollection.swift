@@ -1,6 +1,7 @@
 #if TEXTUAL_ENABLE_TEXT_SELECTION
   import SwiftUI
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   final class LiveTextLayoutCollection: TextLayoutCollection {
     private(set) lazy var layouts: [any TextLayout] = makeLayouts()
 
@@ -40,6 +41,7 @@
     }
   }
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   final class LiveTextLayout: TextLayout {
     var attributedString: NSAttributedString {
       joinedAttributedString.joined
@@ -95,6 +97,7 @@
     }
   }
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   final class LiveTextLine: TextLine {
     var origin: CGPoint {
       base.origin
@@ -134,6 +137,7 @@
     }
   }
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   final class LiveTextRun: TextRun {
     var layoutDirection: LayoutDirection {
       base.layoutDirection
@@ -167,6 +171,7 @@
     }
   }
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   struct EmptyRun: TextRun {
     let layoutDirection: LayoutDirection = .localeBased()
     let typographicBounds: CGRect
@@ -178,6 +183,7 @@
     }
   }
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   final class LiveTextRunSlice: TextRunSlice {
     var typographicBounds: CGRect {
       base.typographicBounds.rect
@@ -192,6 +198,7 @@
     }
   }
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   struct EmptyRunSlice: TextRunSlice {
     let typographicBounds: CGRect
     let characterRange: Range<Int>

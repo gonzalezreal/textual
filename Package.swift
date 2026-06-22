@@ -5,11 +5,11 @@ import PackageDescription
 let package = Package(
   name: "textual",
   platforms: [
-    .macOS(.v15),
-    .iOS(.v18),
-    .tvOS(.v18),
-    .watchOS(.v11),
-    .visionOS(.v2),
+    .macOS(.v14),
+    .iOS(.v17),
+    .tvOS(.v17),
+    .watchOS(.v10),
+    .visionOS(.v1),
   ],
   products: [
     .library(name: "Textual", targets: ["Textual"])

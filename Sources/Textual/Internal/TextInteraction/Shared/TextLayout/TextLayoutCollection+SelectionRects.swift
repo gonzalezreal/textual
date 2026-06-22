@@ -11,6 +11,7 @@
   // and trailing spans to caret positions. Finally, it “inflates” per-line rectangles to fill any
   // vertical gaps between lines so selection highlights appear as a single block.
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   extension TextLayoutCollection {
     func selectionRects(for range: TextRange, layout: Text.Layout) -> [TextSelectionRect] {
       guard
@@ -76,6 +77,7 @@
     }
   }
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   extension TextSelectionRect {
     fileprivate struct Builder {
       let start: IndexPath?
@@ -149,6 +151,7 @@
     }
   }
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   extension Array where Element == [TextSelectionRect] {
     fileprivate mutating func inflate() {
       var previousMaxY: CGFloat? = nil
@@ -174,6 +177,7 @@
     }
   }
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   extension Array where Element == TextSelectionRect {
     fileprivate func index(containing caretX: CGFloat) -> Int? {
       firstIndex {
@@ -182,6 +186,7 @@
     }
   }
 
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
   extension TextSelectionRect {
     fileprivate mutating func trimLeading(to caretX: CGFloat) {
       if layoutDirection == .leftToRight {

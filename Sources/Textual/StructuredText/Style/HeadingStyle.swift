@@ -33,7 +33,14 @@ extension StructuredText {
   }
 }
 
+private struct HeadingStyleKey: EnvironmentKey {
+  nonisolated(unsafe) static let defaultValue: any StructuredText.HeadingStyle = .default
+}
+
 extension EnvironmentValues {
   @usableFromInline
-  @Entry var headingStyle: any StructuredText.HeadingStyle = .default
+  var headingStyle: any StructuredText.HeadingStyle {
+    get { self[HeadingStyleKey.self] }
+    set { self[HeadingStyleKey.self] = newValue }
+  }
 }
