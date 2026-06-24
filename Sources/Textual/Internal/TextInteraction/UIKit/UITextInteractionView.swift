@@ -17,6 +17,14 @@
       true
     }
 
+    override func resignFirstResponder() -> Bool {
+      let didResign = super.resignFirstResponder()
+      if didResign {
+        model.selectedRange = nil
+      }
+      return didResign
+    }
+
     var model: TextSelectionModel
     var exclusionRects: [CGRect]
     var openURL: OpenURLAction
