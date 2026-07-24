@@ -146,7 +146,14 @@ extension TextualNamespace where Base: View {
   public func emojiAttachmentLoader(_ loader: some AttachmentLoader) -> some View {
     base.environment(\.emojiAttachmentLoader, loader)
   }
-
+  
+  /// Sets the postprocessor used to transform attributed content before rendering.
+  public func attributedStringPostprocessor(
+    _ postprocessor: some AttributedStringPostprocessor
+  ) -> some View {
+    base.environment(\.attributedStringPostprocessor, .init(postprocessor))
+  }
+  
   /// Enables or disables text selection for ``InlineText`` and ``StructuredText``.
   @available(tvOS, unavailable)
   @available(watchOS, unavailable)

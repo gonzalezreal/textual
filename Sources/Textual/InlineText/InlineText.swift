@@ -112,9 +112,11 @@ public struct InlineText: View {
 
   public var body: some View {
     WithAttachments(attributedString) {
-      WithInlineStyle($0) {
-        TextFragment($0)
-          .modifier(TextSelectionInteraction())
+      WithAttributedStringPostprocessor($0) {
+        WithInlineStyle($0) {
+          TextFragment($0)
+            .modifier(TextSelectionInteraction())
+        }
       }
     }
     .coordinateSpace(.textContainer)

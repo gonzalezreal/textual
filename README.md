@@ -202,11 +202,11 @@ Here's a practical example, a custom heading style that adds a subtle underline 
 ```swift
 struct CustomHeadingStyle: StructuredText.HeadingStyle {
   private static let fontScales: [CGFloat] = [2, 1.5, 1.25, 1, 0.875, 0.85]
-  
+
   func makeBody(configuration: Configuration) -> some View {
     let headingLevel = min(configuration.headingLevel, 6)
     let fontScale = Self.fontScales[headingLevel - 1]
-    
+
     VStack(alignment: .leading, spacing: 0) {
       configuration.label
         .textual.fontScale(fontScale)
@@ -286,6 +286,41 @@ StructuredText(markdown: content)
 
 The protocol requires implementations for all block types, list markers, and inline styles. This ensures visual
 consistency across your entire document.
+
+### Postprocessing Attributed Content
+
+The `MarkupParser` only runs when the input string changes, so attributes whose source is external
+to the content (a search query, a live filter) belong in a postprocessor. A
+postprocessor transforms the parsed `AttributedString` after attachments are resolved and is
+re-invoked whenever either the parsed string or the postprocessor itself changes.
+
+Apply a postprocessor using the `textual.attributedStringPostprocessor(_:)` modifier:
+
+```swift
+struct SearchHighlighter: AttributedStringPostprocessor {
+  let query: String
+
+  func postprocess(input: AttributedString) -> AttributedString {
+    var output = input
+    var start = output.startIndex
+
+    while let range = output[start...].range(of: query, options: .caseInsensitive) {
+      output[range].backgroundColor = .yellow.opacity(0.4)
+      start = range.upperBound
+    }
+
+    return output
+  }
+}
+
+InlineText(markdown: "Hello, world")
+  .textual.attributedStringPostprocessor(SearchHighlighter(query: "world"))
+```
+
+The postprocessor receives the full attributed string with attachments already resolved; ranges
+are valid against that complete string. Equality (from `Hashable`) drives invalidation, so the
+conforming type must reflect any state that affects output in its `==` implementation — typically
+by storing that state as stored properties of a value type.
 
 ## Demos
 
