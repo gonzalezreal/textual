@@ -10,6 +10,7 @@ enum DemoItem: String, CaseIterable, Hashable {
   case attachmentLoaders
   case tables
   case mathExpressions
+  case postprocessor
   case gitHubReadme
 }
 
@@ -40,6 +41,8 @@ extension DemoItem {
       return Label("Tables", systemImage: "tablecells")
     case .mathExpressions:
       return Label("Math Expressions", systemImage: "x.squareroot")
+    case .postprocessor:
+      return Label("Postprocessor", systemImage: "highlighter")
     case .gitHubReadme:
       return Label("GitHub `README`", systemImage: "doc.text")
     }
@@ -75,6 +78,9 @@ extension DemoItem {
     case .mathExpressions:
       MathExpressionDemo()
         .navigationTitle("Math Expressions")
+    case .postprocessor:
+      PostprocessorDemo()
+        .navigationTitle("Postprocessor")
     case .gitHubReadme:
       GitHubReadmeDemo()
         .navigationTitle("GitHub README")
