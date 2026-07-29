@@ -158,6 +158,20 @@ StructuredText(
 Scrollable regions like code blocks handle their own selection contexts. When you select text in a scrollable area,
 any document-level selection clears automatically, and vice versa.
 
+On macOS, applications can append actions to Textual's selection context menu:
+
+```swift
+StructuredText(markdown: content)
+  .textual.textSelection(.enabled)
+  .textual.textSelectionMenuAction(
+    TextSelectionMenuAction(id: "lookup", title: "Look Up") { selection in
+      lookUp(selection.text, context: selection.surroundingText)
+    }
+  )
+```
+
+The callback also receives the selection bounds in the interaction view's local coordinate space.
+
 ### Styling
 
 Textual provides a flexible styling system that lets you customize every aspect of structured text rendering. At the

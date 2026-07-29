@@ -159,6 +159,22 @@ extension TextualNamespace where Base: View {
     #endif
   }
 
+  #if TEXTUAL_ENABLE_TEXT_SELECTION && canImport(AppKit) && !targetEnvironment(macCatalyst)
+    /// Appends an application-defined action to Textual's macOS selection context menu.
+    ///
+    /// The action receives the selected plain text, its containing text block when available, and
+    /// the local selection bounds. Apply ``textSelection(_:)`` separately to enable selection.
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    @available(visionOS, unavailable)
+    public func textSelectionMenuAction(_ action: TextSelectionMenuAction) -> some View {
+      base.transformEnvironment(\.textSelectionMenuActions) { actions in
+        actions.append(action)
+      }
+    }
+  #endif
+
   /// Sets the spacing used between table cells in ``StructuredText``.
   public func tableCellSpacing(
     horizontal: CGFloat? = nil,

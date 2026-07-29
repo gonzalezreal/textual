@@ -13,6 +13,7 @@
   struct AppKitTextInteractionOverlay: NSViewRepresentable {
     private let model: TextSelectionModel
     private let overflowFrames: [CGRect]
+    @Environment(\.textSelectionMenuActions) private var menuActions
 
     init(model: TextSelectionModel, overflowFrames: [CGRect]) {
       self.model = model
@@ -23,7 +24,8 @@
       NSTextInteractionView(
         model: model,
         exclusionRects: overflowFrames,
-        openURL: context.environment.openURL
+        openURL: context.environment.openURL,
+        menuActions: menuActions
       )
     }
 
@@ -31,6 +33,7 @@
       nsView.model = model
       nsView.exclusionRects = overflowFrames
       nsView.openURL = context.environment.openURL
+      nsView.menuActions = menuActions
     }
   }
 #endif

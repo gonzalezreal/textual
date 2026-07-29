@@ -7,6 +7,26 @@
 
   extension TextSelectionModelTests {
     @Test
+    @MainActor
+    @available(iOS, unavailable)
+    @available(visionOS, unavailable)
+    func customMenuSelectionIncludesSelectedWordAndBlock() throws {
+      let model = try TextSelectionModel(fixtureName: "two-paragraphs-bidi")
+      let position = TextPosition(
+        indexPath: .init(runSlice: 2, run: 1, line: 0, layout: 0),
+        affinity: .downstream
+      )
+      let range = try #require(model.wordRange(for: position))
+
+      let selection = try #require(model.menuSelection(in: range))
+
+      #expect(selection.text == "sample")
+      #expect(selection.surroundingText?.contains("sample paragraph") == true)
+      #expect(!selection.selectionRect.isNull)
+      #expect(!selection.selectionRect.isEmpty)
+    }
+
+    @Test
     @available(iOS, unavailable)
     @available(visionOS, unavailable)
     func wordRange() throws {

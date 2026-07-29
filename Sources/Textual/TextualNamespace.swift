@@ -21,6 +21,12 @@ import Foundation
 public struct TextualNamespace<Base> {
   @usableFromInline let base: Base
   @inlinable public init(_ base: Base) { self.base = base }
+
+  /// The value wrapped by this namespace.
+  ///
+  /// This property lets integration packages add `.textual` APIs without requiring those APIs
+  /// to live in the Textual module.
+  @inlinable public var content: Base { base }
 }
 
 extension TextualNamespace: Sendable where Base: Sendable {}

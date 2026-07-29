@@ -46,5 +46,9 @@ struct TextSelectionInteraction: ViewModifier {
     @available(watchOS, unavailable)
     @usableFromInline
     @Entry var textSelection: any TextSelectability.Type = DisabledTextSelectability.self
+
+    #if canImport(AppKit) && !targetEnvironment(macCatalyst)
+      @Entry var textSelectionMenuActions: [TextSelectionMenuAction] = []
+    #endif
   }
 #endif

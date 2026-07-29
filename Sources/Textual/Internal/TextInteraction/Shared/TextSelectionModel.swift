@@ -106,6 +106,31 @@
       attributedText(in: range).string
     }
 
+    #if canImport(AppKit) && !targetEnvironment(macCatalyst)
+      func menuSelection(in range: TextRange) -> TextualTextSelection? {
+        guard !range.isCollapsed else {
+          return nil
+        }
+
+        let selectedText = text(in: range)
+        guard !selectedText.isEmpty else {
+          return nil
+        }
+
+        let surroundingText = blockRange(for: range.start).map(text(in:))
+        let rect = selectionRects(for: range)
+          .map(\.rect)
+          .reduce(into: CGRect.null) { result, rect in
+            result = result.union(rect)
+          }
+        return TextualTextSelection(
+          text: selectedText,
+          surroundingText: surroundingText,
+          selectionRect: rect
+        )
+      }
+    #endif
+
     func position(from position: TextPosition, offset: Int) -> TextPosition? {
       layoutCollection.position(from: position, offset: offset)
     }

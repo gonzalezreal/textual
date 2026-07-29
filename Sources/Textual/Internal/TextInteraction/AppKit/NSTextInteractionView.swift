@@ -14,6 +14,7 @@
     var model: TextSelectionModel
     var exclusionRects: [CGRect]
     var openURL: OpenURLAction
+    var menuActions: [TextSelectionMenuAction]
 
     override var acceptsFirstResponder: Bool { true }
     override var isFlipped: Bool { true }
@@ -21,15 +22,18 @@
 
     private var dragStart: TextPosition?
     private var selectionAnchor: TextPosition?
+    private var menuActionsByID: [String: TextSelectionMenuAction] = [:]
 
     init(
       model: TextSelectionModel,
       exclusionRects: [CGRect],
-      openURL: OpenURLAction
+      openURL: OpenURLAction,
+      menuActions: [TextSelectionMenuAction]
     ) {
       self.model = model
       self.exclusionRects = exclusionRects
       self.openURL = openURL
+      self.menuActions = menuActions
 
       super.init(frame: .zero)
       self.wantsLayer = false
@@ -219,6 +223,26 @@
         )
       )
 
+      if !menuActions.isEmpty, let selection = model.menuSelection(in: selectedRange) {
+        menuActionsByID = Dictionary(
+          menuActions.map { ($0.id, $0) },
+          uniquingKeysWith: { _, latest in latest }
+        )
+        contextMenu.addItem(.separator())
+        for action in menuActions {
+          let item = NSMenuItem(
+            title: action.title(for: selection),
+            action: #selector(performSelectionMenuAction(_:)),
+            keyEquivalent: ""
+          )
+          item.target = self
+          item.representedObject = action.id
+          contextMenu.addItem(item)
+        }
+      } else {
+        menuActionsByID.removeAll()
+      }
+
       return contextMenu
     }
 
@@ -287,6 +311,17 @@
       let formatter = Formatter(attributedText)
       pasteboard.setString(formatter.plainText(), forType: .string)
       pasteboard.setString(formatter.html(), forType: .html)
+    }
+
+    @objc private func performSelectionMenuAction(_ sender: NSMenuItem) {
+      guard let id = sender.representedObject as? String,
+        let action = menuActionsByID[id],
+        let selectedRange = model.selectedRange,
+        let selection = model.menuSelection(in: selectedRange)
+      else {
+        return
+      }
+      action.perform(with: selection)
     }
   }
 
