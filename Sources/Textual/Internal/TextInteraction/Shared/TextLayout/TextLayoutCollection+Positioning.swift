@@ -29,7 +29,9 @@
     }
 
     func position(from position: TextPosition, offset: Int) -> TextPosition? {
-      let from = characterIndex(at: position)
+      guard let from = characterIndex(at: position) else {
+        return nil
+      }
       let target = from + offset
 
       guard (0...stringLength).contains(target) else {
@@ -59,11 +61,36 @@
       return self.position(at: layout, localCharacterIndex: localTarget)
     }
 
-    func characterIndex(at position: TextPosition) -> Int {
+    func characterIndex(at position: TextPosition) -> Int? {
+      guard contains(position) else {
+        return nil
+      }
       let base = layouts.prefix(position.indexPath.layout)
         .map(\.attributedString.length)
         .reduce(0, +)
       return base + localCharacterIndex(at: position)
+    }
+
+    func contains(_ position: TextPosition) -> Bool {
+      let indexPath = position.indexPath
+      guard
+        indexPath.count == 4,
+        layouts.indices.contains(indexPath.layout)
+      else {
+        return false
+      }
+
+      let layout = layouts[indexPath.layout]
+      guard layout.lines.indices.contains(indexPath.line) else {
+        return false
+      }
+
+      let line = layout.lines[indexPath.line]
+      guard line.runs.indices.contains(indexPath.run) else {
+        return false
+      }
+
+      return line.runs[indexPath.run].slices.indices.contains(indexPath.runSlice)
     }
 
     func localCharacterIndex(at position: TextPosition) -> Int {

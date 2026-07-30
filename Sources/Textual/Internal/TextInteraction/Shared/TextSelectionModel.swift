@@ -111,7 +111,13 @@
     }
 
     func offset(from: TextPosition, to: TextPosition) -> Int {
-      layoutCollection.characterIndex(at: to) - layoutCollection.characterIndex(at: from)
+      guard
+        let fromIndex = layoutCollection.characterIndex(at: from),
+        let toIndex = layoutCollection.characterIndex(at: to)
+      else {
+        return 0
+      }
+      return toIndex - fromIndex
     }
 
     func firstRect(for range: TextRange) -> CGRect {
