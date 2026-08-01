@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		5B01DF6C2EEC2296005AF467 /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = 5B01DF6B2EEC2296005AF467 /* Textual */; };
-		E90DDB03301DBEB400982517 /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = E90DDB02301DBEB400982517 /* Textual */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,7 +27,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E90DDB03301DBEB400982517 /* Textual in Frameworks */,
 				5B01DF6C2EEC2296005AF467 /* Textual in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -81,7 +79,6 @@
 			name = TextualDemo;
 			packageProductDependencies = (
 				5B01DF6B2EEC2296005AF467 /* Textual */,
-				E90DDB02301DBEB400982517 /* Textual */,
 			);
 			productName = TextualDemo;
 			productReference = 5B8D77362EEC208E008C2F0D /* TextualDemo.app */;
@@ -111,9 +108,6 @@
 			);
 			mainGroup = 5B8D772D2EEC208E008C2F0D;
 			minimizedProjectReferenceProxies = 1;
-			packageReferences = (
-				E90DDB01301DBEB400982517 /* XCLocalSwiftPackageReference "../../../textual" */,
-			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5B8D77372EEC208E008C2F0D /* Products */;
 			projectDirPath = "";
@@ -394,19 +388,8 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		E90DDB01301DBEB400982517 /* XCLocalSwiftPackageReference "../../../textual" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../textual;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
 		5B01DF6B2EEC2296005AF467 /* Textual */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Textual;
-		};
-		E90DDB02301DBEB400982517 /* Textual */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Textual;
 		};
