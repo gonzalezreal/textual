@@ -145,7 +145,8 @@ extension StructuredText {
   ///   - baseURL: A base URL used to resolve relative links and image URLs.
   ///   - syntaxExtensions: Custom syntax extensions applied after markdown parsing.
   ///
-  /// Math expressions are supported when you include `.math` in `syntaxExtensions`:
+  /// With the package's `Math` trait enabled, math expressions are supported when you include
+  /// `.math` in `syntaxExtensions`:
   ///
   /// ```swift
   /// StructuredText(

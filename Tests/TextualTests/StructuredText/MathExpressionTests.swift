@@ -1,4 +1,4 @@
-#if os(iOS) && !targetEnvironment(macCatalyst)
+#if Math && os(iOS) && !targetEnvironment(macCatalyst)
   import SnapshotTesting
   import SwiftUI
   import Testing

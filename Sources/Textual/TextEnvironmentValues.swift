@@ -17,8 +17,10 @@ public struct TextEnvironmentValues: Hashable, Sendable {
   /// Properties that control how Textual renders emoji.
   public var emojiProperties: EmojiProperties
 
-  /// Properties that control how Textual renders math expressions.
-  public var mathProperties: MathProperties
+  #if Math
+    /// Properties that control how Textual renders math expressions.
+    public var mathProperties: MathProperties
+  #endif
 
   /// The current color scheme in the environment.
   public var colorScheme: ColorScheme
@@ -34,35 +36,64 @@ public struct TextEnvironmentValues: Hashable, Sendable {
     )
   }
 
-  init(
-    font: Font? = nil,
-    dynamicTypeSize: DynamicTypeSize = .large,
-    legibilityWeight: LegibilityWeight? = nil,
-    emojiProperties: EmojiProperties = .init(),
-    mathProperties: MathProperties = .init(),
-    colorScheme: ColorScheme = .light,
-    colorSchemeContrast: ColorSchemeContrast = .standard
-  ) {
-    self.font = font
-    self.dynamicTypeSize = dynamicTypeSize
-    self.legibilityWeight = legibilityWeight
-    self.emojiProperties = emojiProperties
-    self.mathProperties = mathProperties
-    self.colorScheme = colorScheme
-    self.colorSchemeContrast = colorSchemeContrast
-  }
+  #if Math
+    init(
+      font: Font? = nil,
+      dynamicTypeSize: DynamicTypeSize = .large,
+      legibilityWeight: LegibilityWeight? = nil,
+      emojiProperties: EmojiProperties = .init(),
+      mathProperties: MathProperties = .init(),
+      colorScheme: ColorScheme = .light,
+      colorSchemeContrast: ColorSchemeContrast = .standard
+    ) {
+      self.font = font
+      self.dynamicTypeSize = dynamicTypeSize
+      self.legibilityWeight = legibilityWeight
+      self.emojiProperties = emojiProperties
+      self.mathProperties = mathProperties
+      self.colorScheme = colorScheme
+      self.colorSchemeContrast = colorSchemeContrast
+    }
+  #else
+    init(
+      font: Font? = nil,
+      dynamicTypeSize: DynamicTypeSize = .large,
+      legibilityWeight: LegibilityWeight? = nil,
+      emojiProperties: EmojiProperties = .init(),
+      colorScheme: ColorScheme = .light,
+      colorSchemeContrast: ColorSchemeContrast = .standard
+    ) {
+      self.font = font
+      self.dynamicTypeSize = dynamicTypeSize
+      self.legibilityWeight = legibilityWeight
+      self.emojiProperties = emojiProperties
+      self.colorScheme = colorScheme
+      self.colorSchemeContrast = colorSchemeContrast
+    }
+  #endif
 }
 
 extension EnvironmentValues {
   var textEnvironment: TextEnvironmentValues {
-    .init(
-      font: font,
-      dynamicTypeSize: dynamicTypeSize,
-      legibilityWeight: legibilityWeight,
-      emojiProperties: emojiProperties,
-      mathProperties: mathProperties,
-      colorScheme: colorScheme,
-      colorSchemeContrast: colorSchemeContrast
-    )
+    #if Math
+      .init(
+        font: font,
+        dynamicTypeSize: dynamicTypeSize,
+        legibilityWeight: legibilityWeight,
+        emojiProperties: emojiProperties,
+        mathProperties: mathProperties,
+        colorScheme: colorScheme,
+        colorSchemeContrast: colorSchemeContrast
+      )
+    #else
+      .init(
+        font: font,
+        dynamicTypeSize: dynamicTypeSize,
+        legibilityWeight: legibilityWeight,
+        emojiProperties: emojiProperties,
+        colorScheme: colorScheme,
+        colorSchemeContrast: colorSchemeContrast
+      )
+    #endif
   }
 }

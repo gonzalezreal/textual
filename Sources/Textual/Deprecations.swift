@@ -42,12 +42,19 @@ extension AttributedStringMarkdownParser {
   @available(*, deprecated, message: "Use 'SyntaxExtension' instead.")
   public struct PatternOptions: Hashable, Sendable {
     public var emoji: Set<Emoji>
-    public var mathExpressions: Bool
 
-    public init(emoji: Set<Emoji> = [], mathExpressions: Bool = false) {
-      self.emoji = emoji
-      self.mathExpressions = mathExpressions
-    }
+    #if Math
+      public var mathExpressions: Bool
+
+      public init(emoji: Set<Emoji> = [], mathExpressions: Bool = false) {
+        self.emoji = emoji
+        self.mathExpressions = mathExpressions
+      }
+    #else
+      public init(emoji: Set<Emoji> = []) {
+        self.emoji = emoji
+      }
+    #endif
   }
 
   @available(*, deprecated, message: "Use 'init(baseURL:options:syntaxExtensions:)' instead.")
@@ -57,14 +64,24 @@ extension AttributedStringMarkdownParser {
     options: AttributedString.MarkdownParsingOptions = .init(),
     patternOptions: PatternOptions = .init()
   ) {
-    self.init(
-      baseURL: baseURL,
-      options: options,
-      syntaxExtensions: [
-        patternOptions.emoji.isEmpty ? nil : .emoji(patternOptions.emoji),
-        patternOptions.mathExpressions ? .math : nil,
-      ].compactMap(\.self)
-    )
+    #if Math
+      self.init(
+        baseURL: baseURL,
+        options: options,
+        syntaxExtensions: [
+          patternOptions.emoji.isEmpty ? nil : .emoji(patternOptions.emoji),
+          patternOptions.mathExpressions ? .math : nil,
+        ].compactMap(\.self)
+      )
+    #else
+      self.init(
+        baseURL: baseURL,
+        options: options,
+        syntaxExtensions: [
+          patternOptions.emoji.isEmpty ? nil : .emoji(patternOptions.emoji)
+        ].compactMap(\.self)
+      )
+    #endif
   }
 }
 

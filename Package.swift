@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.1
 
 import PackageDescription
 
@@ -14,6 +14,12 @@ let package = Package(
   products: [
     .library(name: "Textual", targets: ["Textual"])
   ],
+  traits: [
+    .trait(
+      name: "Math",
+      description: "Enables LaTeX math rendering through SwiftUIMath."
+    )
+  ],
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-concurrency-extras", from: "1.3.1"),
     .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.7"),
@@ -24,7 +30,11 @@ let package = Package(
       name: "Textual",
       dependencies: [
         .product(name: "ConcurrencyExtras", package: "swift-concurrency-extras"),
-        .product(name: "SwiftUIMath", package: "swiftui-math"),
+        .product(
+          name: "SwiftUIMath",
+          package: "swiftui-math",
+          condition: .when(traits: ["Math"])
+        ),
       ],
       resources: [
         .process("Internal/Highlighter/Prism")
