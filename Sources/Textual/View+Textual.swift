@@ -147,6 +147,40 @@ extension TextualNamespace where Base: View {
     base.environment(\.emojiAttachmentLoader, loader)
   }
 
+  /// Declares that the content behind this view may still be growing, e.g. streamed
+  /// incrementally from a language model.
+  ///
+  /// While `true`, ``InlineText`` and ``StructuredText`` reveal newly-arrived text with a subtle
+  /// fade, at a pace configured by ``revealAnimation(_:)``. Only the actively-growing leaf
+  /// fragment ever animates — settled content and blocks that are no longer the last one pay no
+  /// runtime cost and remain fully selectable.
+  ///
+  /// Raw, growing Markdown source can briefly contain unmatched syntax (an unclosed `**`, for
+  /// example) that a Markdown parser would otherwise render as literal characters until it
+  /// closes. Use ``StreamingMarkdownBuffer`` to withhold those characters before they reach
+  /// ``StructuredText``:
+  ///
+  /// ```swift
+  /// var buffer = StreamingMarkdownBuffer()
+  /// // ...each time a new chunk arrives from your network layer:
+  /// visibleMarkdown = buffer.append(chunk)
+  /// // ...once the stream ends:
+  /// visibleMarkdown = buffer.flush()
+  ///
+  /// StructuredText(markdown: visibleMarkdown)
+  ///   .textual.textStreaming(isStillStreaming)
+  /// ```
+  @inlinable
+  public func textStreaming(_ isStreaming: Bool) -> some View {
+    base.environment(\.textStreamingEnabled, isStreaming)
+  }
+
+  /// Configures the reveal animation used while ``textStreaming(_:)`` is active.
+  @inlinable
+  public func revealAnimation(_ revealAnimation: RevealAnimation) -> some View {
+    base.environment(\.revealAnimation, revealAnimation)
+  }
+
   /// Enables or disables text selection for ``InlineText`` and ``StructuredText``.
   @available(tvOS, unavailable)
   @available(watchOS, unavailable)
