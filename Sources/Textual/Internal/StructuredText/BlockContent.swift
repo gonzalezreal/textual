@@ -2,6 +2,9 @@ import SwiftUI
 
 extension StructuredText {
   struct BlockContent<Content: AttributedStringProtocol>: View {
+    @Environment(\.textStreamingEnabled) private var textStreamingEnabled
+    @Environment(\.revealAnimation) private var revealAnimation
+
     private let parent: PresentationIntent.IntentType?
     private let content: Content
 
@@ -16,7 +19,24 @@ extension StructuredText {
       BlockVStack {
         ForEach(runs.indices, id: \.self) { index in
           let run = runs[index]
-          Block(intent: run.intent, content: content[run.range])
+          let blockContent = content[run.range]
+          // Only the last block may still be growing (e.g. streamed from a language model) —
+          // narrow textStreamingEnabled so every earlier, settled block pays no reveal-animation
+          // cost and remains fully selectable. This narrowing composes through nested
+          // BlockContent instances (lists, block quotes) automatically, since each level re-reads
+          // its own inherited value and re-applies the same last-index check.
+          let isActive = textStreamingEnabled && index == runs.indices.last
+
+          Block(intent: run.intent, content: blockContent)
+            .environment(\.textStreamingEnabled, isActive)
+            // Companion height animation: as the active block grows to accommodate newly
+            // streamed lines, animate the height change instead of snapping. A separate
+            // mechanism from the glyph-level RevealTextRenderer — this is SwiftUI's standard
+            // implicit geometry animation, scoped to just this block.
+            .animation(
+              isActive ? revealAnimation.heightAnimation : nil,
+              value: blockContent.characters.count
+            )
         }
       }
     }

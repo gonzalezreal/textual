@@ -11,6 +11,7 @@ enum DemoItem: String, CaseIterable, Hashable {
   case tables
   case mathExpressions
   case gitHubReadme
+  case revealTextAnimation
 }
 
 extension DemoItem: Identifiable {
@@ -42,6 +43,8 @@ extension DemoItem {
       return Label("Math Expressions", systemImage: "x.squareroot")
     case .gitHubReadme:
       return Label("GitHub `README`", systemImage: "doc.text")
+    case .revealTextAnimation:
+      return Label("Reveal Text Animation", systemImage: "wand.and.stars")
     }
   }
 
@@ -78,6 +81,9 @@ extension DemoItem {
     case .gitHubReadme:
       GitHubReadmeDemo()
         .navigationTitle("GitHub README")
+    case .revealTextAnimation:
+      RevealTextAnimationDemo()
+        .navigationTitle("Reveal Text Animation")
     }
   }
 }

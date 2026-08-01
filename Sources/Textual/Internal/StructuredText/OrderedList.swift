@@ -10,6 +10,8 @@ extension StructuredText {
   struct OrderedList: View {
     @Environment(\.listItemSpacing) private var listItemSpacing
     @Environment(\.textEnvironment) private var textEnvironment
+    @Environment(\.textStreamingEnabled) private var textStreamingEnabled
+    @Environment(\.revealAnimation) private var revealAnimation
 
     @State private var markerWidth: CGFloat?
 
@@ -27,11 +29,21 @@ extension StructuredText {
       BlockVStack {
         ForEach(runs.indices, id: \.self) { index in
           let run = runs[index]
+          let itemContent = content[run.range]
+          // Only the last item may still be growing — narrow textStreamingEnabled the same way
+          // BlockContent does, so it composes correctly into the nested BlockContent each
+          // OrderedListItem constructs.
+          let isActive = textStreamingEnabled && index == runs.indices.last
 
           OrderedListItem(
             intent: run.intent,
-            content: content[run.range],
+            content: itemContent,
             markerWidth: markerWidth
+          )
+          .environment(\.textStreamingEnabled, isActive)
+          .animation(
+            isActive ? revealAnimation.heightAnimation : nil,
+            value: itemContent.characters.count
           )
         }
       }

@@ -4,6 +4,8 @@ extension StructuredText {
   struct UnorderedList: View {
     @Environment(\.listItemSpacing) private var listItemSpacing
     @Environment(\.textEnvironment) private var textEnvironment
+    @Environment(\.textStreamingEnabled) private var textStreamingEnabled
+    @Environment(\.revealAnimation) private var revealAnimation
 
     private let intent: PresentationIntent.IntentType?
     private let content: AttributedSubstring
@@ -19,10 +21,20 @@ extension StructuredText {
       BlockVStack {
         ForEach(runs.indices, id: \.self) { index in
           let run = runs[index]
+          let itemContent = content[run.range]
+          // Only the last item may still be growing — narrow textStreamingEnabled the same way
+          // BlockContent does, so it composes correctly into the nested BlockContent each
+          // UnorderedListItem constructs.
+          let isActive = textStreamingEnabled && index == runs.indices.last
 
           UnorderedListItem(
             intent: run.intent,
-            content: content[run.range]
+            content: itemContent
+          )
+          .environment(\.textStreamingEnabled, isActive)
+          .animation(
+            isActive ? revealAnimation.heightAnimation : nil,
+            value: itemContent.characters.count
           )
         }
       }
