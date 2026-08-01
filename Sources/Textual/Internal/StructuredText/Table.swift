@@ -10,6 +10,7 @@ import SwiftUI
 extension StructuredText {
   struct Table: View {
     @Environment(\.tableStyle) private var tableStyle
+    @Environment(\.textStreamingEnabled) private var textStreamingEnabled
 
     @State private var spacing = TableCell.Spacing()
 
@@ -49,13 +50,19 @@ extension StructuredText {
           let rowRun = rowRuns[rowIndex]
           let rowContent = content[rowRun.range]
           let columnRuns = rowContent.blockRuns(parent: rowRun.intent)
+          let isLastRow = rowIndex == rowRuns.indices.last
 
           GridRow {
             ForEach(columnRuns.indices, id: \.self) { columnIndex in
               let cellRun = columnRuns[columnIndex]
               let cellContent = rowContent[cellRun.range]
+              // Only the bottom-right cell may still be growing — narrow textStreamingEnabled
+              // the same way BlockContent does, so every other cell (including earlier cells in
+              // this same row) settles immediately instead of inheriting "active" uniformly.
+              let isActive = textStreamingEnabled && isLastRow && columnIndex == columnRuns.indices.last
 
               TableCell(cellContent, row: rowIndex, column: columnIndex)
+                .environment(\.textStreamingEnabled, isActive)
                 .gridColumnAlignment(alignment(for: columnIndex))
             }
           }

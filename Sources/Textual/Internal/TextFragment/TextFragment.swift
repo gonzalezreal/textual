@@ -103,6 +103,7 @@ struct TextFragment<Content: AttributedStringProtocol>: View {
         text.textRenderer(
           RevealTextRenderer(
             revealedGlyphCount: revealState.currentGlyphCount(at: timeline.date),
+            totalGlyphCount: Double(revealState.targetGlyphCount),
             configuration: revealAnimation
           )
         )
@@ -113,6 +114,7 @@ struct TextFragment<Content: AttributedStringProtocol>: View {
       text.textRenderer(
         RevealTextRenderer(
           revealedGlyphCount: Double(revealState.targetGlyphCount),
+          totalGlyphCount: Double(revealState.targetGlyphCount),
           configuration: revealAnimation
         )
       )

@@ -27,6 +27,15 @@ struct RevealTextAnimationDemo: View {
 
     ![A calm reading space](https://picsum.photos/seed/textual-reveal/400/200)
 
+    | Technique | Granularity | Motion |
+    |---|---|---|
+    | Typewriter | Character | None |
+    | Word fade | Word | Fade |
+    | Textual's reveal | Glyph cluster | Fade + blur |
+
+    Tables aren't animated yet — a cell's content is only recognized as part of a row once its \
+    whole line has arrived, so it tends to pop in already-formed rather than fading in.
+
     ## Built on `TextRenderer`
 
     iOS 18's `TextRenderer` protocol lets Textual intercept how `Text` draws its glyphs and \

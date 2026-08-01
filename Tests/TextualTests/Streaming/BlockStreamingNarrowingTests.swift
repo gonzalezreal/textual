@@ -59,6 +59,35 @@
       )
     }
 
+    @Test func rendersStreamingTableWithoutCrashing() {
+      #expect(
+        render(
+          markdown: """
+            | A | B |
+            |---|---|
+            | one | two |
+            | three | still growin
+            """
+        )
+      )
+    }
+
+    @Test func rendersStreamingTableFollowedByParagraphWithoutCrashing() {
+      // Once a later block arrives, the table is no longer "last" — exercises the settle
+      // transition (every cell should snap to full opacity, not stay ghosted).
+      #expect(
+        render(
+          markdown: """
+            | A | B |
+            |---|---|
+            | one | two |
+
+            A paragraph after the table, still growin
+            """
+        )
+      )
+    }
+
     private func render(markdown: String) -> Bool {
       let renderer = ImageRenderer(
         content: StructuredText(markdown: markdown)

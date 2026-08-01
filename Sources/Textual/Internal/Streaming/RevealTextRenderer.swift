@@ -21,6 +21,11 @@ struct RevealTextRenderer: TextRenderer, Animatable {
   /// already-computed instantaneous value by `TextFragment`'s `TimelineView`-driven clock.
   var revealedGlyphCount: Double
 
+  /// The total glyph count of the content being drawn — i.e. what `revealedGlyphCount` is
+  /// capped at once fully caught up. Used to keep a glyph's local fade window from extending
+  /// past the actual end of the content (see `progress(clusterStart:revealedGlyphCount:...)`).
+  let totalGlyphCount: Double
+
   let configuration: RevealAnimation
 
   var animatableData: Double {
@@ -36,10 +41,13 @@ struct RevealTextRenderer: TextRenderer, Animatable {
         for slice in run {
           defer { glyphIndex += 1 }
 
-          let clusterStart = (glyphIndex / configuration.clusterSize) * configuration.clusterSize
-          let rawProgress =
-            (revealedGlyphCount - Double(clusterStart)) / max(configuration.fadeWindow, 1)
-          let progress = smoothstep(clamp(rawProgress, to: 0...1))
+          let clusterStart = Double((glyphIndex / configuration.clusterSize) * configuration.clusterSize)
+          let progress = Self.progress(
+            clusterStart: clusterStart,
+            revealedGlyphCount: revealedGlyphCount,
+            fadeWindow: configuration.fadeWindow,
+            totalGlyphCount: totalGlyphCount
+          )
 
           if progress <= 0 {
             // Not yet revealed — skip drawing entirely.
@@ -61,6 +69,26 @@ struct RevealTextRenderer: TextRenderer, Animatable {
       }
     }
   }
+
+  /// The fade progress (0...1) for a glyph cluster starting at `clusterStart`, given how far
+  /// the reveal has advanced and the configured fade window.
+  ///
+  /// The window's far edge is clamped to `totalGlyphCount`, so a cluster's local fade window
+  /// never extends past where the content actually ends. Without this, content shorter than
+  /// `fadeWindow` — or the trailing cluster of any content — could never reach full opacity:
+  /// `revealedGlyphCount` is capped at `totalGlyphCount` once caught up, but an unclamped window
+  /// could require it to travel further than the content is long to reach progress 1.
+  static func progress(
+    clusterStart: Double,
+    revealedGlyphCount: Double,
+    fadeWindow: Double,
+    totalGlyphCount: Double
+  ) -> Double {
+    let windowEnd = min(clusterStart + fadeWindow, totalGlyphCount)
+    let windowWidth = max(windowEnd - clusterStart, 1)
+    let rawProgress = (revealedGlyphCount - clusterStart) / windowWidth
+    return smoothstep(clamp(rawProgress, to: 0...1))
+  }
 }
 
 private func smoothstep(_ x: Double) -> Double {
@@ -79,7 +107,13 @@ private func clamp(_ x: Double, to range: ClosedRange<Double>) -> Double {
       "The quick brown fox jumps over the lazy dog, revealing itself one small cluster of glyphs at a time."
     )
     .font(.title3)
-    .textRenderer(RevealTextRenderer(revealedGlyphCount: revealedGlyphCount, configuration: .default))
+    .textRenderer(
+      RevealTextRenderer(
+        revealedGlyphCount: revealedGlyphCount,
+        totalGlyphCount: 110,
+        configuration: .default
+      )
+    )
 
     Slider(value: $revealedGlyphCount, in: 0...110)
   }
