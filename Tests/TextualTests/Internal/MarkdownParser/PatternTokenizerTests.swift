@@ -126,74 +126,76 @@ struct PatternTokenizerTests {
     )
   }
 
-  @Test func inlineMath() throws {
-    // given
-    let tokenizer = PatternTokenizer(patterns: [.mathBlock, .mathInline])
+  #if Math
+    @Test func inlineMath() throws {
+      // given
+      let tokenizer = PatternTokenizer(patterns: [.mathBlock, .mathInline])
 
-    // when
-    let tokens = try tokenizer.tokenize("Euler: $e^{i\\pi}+1=0$.")
+      // when
+      let tokens = try tokenizer.tokenize("Euler: $e^{i\\pi}+1=0$.")
 
-    // then
-    #expect(
-      tokens == [
-        .init(type: .text, content: "Euler: "),
-        .init(type: .mathInline, content: "$e^{i\\pi}+1=0$", capturedContent: "e^{i\\pi}+1=0"),
-        .init(type: .text, content: "."),
-      ]
-    )
-  }
+      // then
+      #expect(
+        tokens == [
+          .init(type: .text, content: "Euler: "),
+          .init(type: .mathInline, content: "$e^{i\\pi}+1=0$", capturedContent: "e^{i\\pi}+1=0"),
+          .init(type: .text, content: "."),
+        ]
+      )
+    }
 
-  @Test func inlineMathEscapedDollar() throws {
-    // given
-    let tokenizer = PatternTokenizer(patterns: [.mathBlock, .mathInline])
+    @Test func inlineMathEscapedDollar() throws {
+      // given
+      let tokenizer = PatternTokenizer(patterns: [.mathBlock, .mathInline])
 
-    // when
-    let tokens = try tokenizer.tokenize("Cost: $a\\$b$")
+      // when
+      let tokens = try tokenizer.tokenize("Cost: $a\\$b$")
 
-    // then
-    #expect(
-      tokens == [
-        .init(type: .text, content: "Cost: "),
-        .init(type: .mathInline, content: "$a\\$b$", capturedContent: "a\\$b"),
-      ]
-    )
-  }
+      // then
+      #expect(
+        tokens == [
+          .init(type: .text, content: "Cost: "),
+          .init(type: .mathInline, content: "$a\\$b$", capturedContent: "a\\$b"),
+        ]
+      )
+    }
 
-  @Test func blockMath() throws {
-    // given
-    let tokenizer = PatternTokenizer(patterns: [.mathBlock, .mathInline])
+    @Test func blockMath() throws {
+      // given
+      let tokenizer = PatternTokenizer(patterns: [.mathBlock, .mathInline])
 
-    // when
-    let tokens = try tokenizer.tokenize(
-      """
-      Before
-      $$E = mc^2$$
-      After
-      """
-    )
+      // when
+      let tokens = try tokenizer.tokenize(
+        """
+        Before
+        $$E = mc^2$$
+        After
+        """
+      )
 
-    // then
-    #expect(
-      tokens == [
-        .init(type: .text, content: "Before\n"),
-        .init(type: .mathBlock, content: "$$E = mc^2$$", capturedContent: "E = mc^2"),
-        .init(type: .text, content: "\nAfter"),
-      ]
-    )
-  }
+      // then
+      #expect(
+        tokens == [
+          .init(type: .text, content: "Before\n"),
+          .init(type: .mathBlock, content: "$$E = mc^2$$", capturedContent: "E = mc^2"),
+          .init(type: .text, content: "\nAfter"),
+        ]
+      )
+    }
 
-  @Test func blockMathPreferredOverInline() throws {
-    // given
-    let tokenizer = PatternTokenizer(patterns: [.mathBlock, .mathInline])
+    @Test func blockMathPreferredOverInline() throws {
+      // given
+      let tokenizer = PatternTokenizer(patterns: [.mathBlock, .mathInline])
 
-    // when
-    let tokens = try tokenizer.tokenize("$$x+1$$")
+      // when
+      let tokens = try tokenizer.tokenize("$$x+1$$")
 
-    // then
-    #expect(
-      tokens == [
-        .init(type: .mathBlock, content: "$$x+1$$", capturedContent: "x+1")
-      ]
-    )
-  }
+      // then
+      #expect(
+        tokens == [
+          .init(type: .mathBlock, content: "$$x+1$$", capturedContent: "x+1")
+        ]
+      )
+    }
+  #endif
 }

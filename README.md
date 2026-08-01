@@ -30,7 +30,7 @@ applies styling through environment values, and uses SwiftUI's layout system to 
 - **Markdown support** via Foundation's `AttributedString` built-in parser
 - **Custom markup parser support** through the `MarkupParser` protocol
 - **Inline attachments** that flow with the text, such as images and custom emoji
-- **Math expressions** rendered as inline or block attachments
+- **Optional math expressions** rendered as inline or block attachments
 - **Animated image support** (GIF, APNG, WebP)
 - **Syntax highlighting** with customizable themes
 - **Comprehensive styling** for headings, code blocks, tables, links, lists, and more
@@ -131,7 +131,8 @@ InlineText(
 )
 ```
 
-Math expressions are also supported when you include `.math` in `syntaxExtensions`:
+Math expressions are available when the package's `Math` trait is enabled. Once enabled, include
+`.math` in `syntaxExtensions`:
 
 ```swift
 StructuredText(
@@ -312,6 +313,19 @@ simple as adding it to your `Package.swift`:
 ``` swift
 dependencies: [
   .package(url: "https://github.com/gonzalezreal/textual", from: "0.1.0")
+]
+```
+
+Math rendering is disabled by default so clients that do not need it avoid SwiftUIMath and its font
+resources. Enable the `Math` trait explicitly to include math support:
+
+```swift
+dependencies: [
+  .package(
+    url: "https://github.com/gonzalezreal/textual",
+    from: "0.1.0",
+    traits: [.defaults, "Math"]
+  )
 ]
 ```
 

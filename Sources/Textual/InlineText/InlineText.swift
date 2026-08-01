@@ -61,7 +61,8 @@ import SwiftUI
 /// )
 /// ```
 ///
-/// Math expressions are supported when you include `.math` in `syntaxExtensions`:
+/// With the package's `Math` trait enabled, math expressions are supported when you include
+/// `.math` in `syntaxExtensions`:
 ///
 /// ```swift
 /// InlineText(

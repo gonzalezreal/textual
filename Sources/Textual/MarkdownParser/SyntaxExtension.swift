@@ -37,18 +37,20 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
     }
   }
 
-  /// Replaces inline and block math expressions with attachments.
-  public static var math: Self {
-    .init(patterns: [.mathBlock, .mathInline]) { token, attributes in
-      guard let latex = token.capturedContent else {
-        return nil
-      }
+  #if Math
+    /// Replaces inline and block math expressions with attachments.
+    public static var math: Self {
+      .init(patterns: [.mathBlock, .mathInline]) { token, attributes in
+        guard let latex = token.capturedContent else {
+          return nil
+        }
 
-      let attachment = MathAttachment(
-        latex: latex,
-        style: token.type == .mathBlock ? .block : .inline
-      )
-      return AttributedString("\u{FFFC}", attributes: attributes.attachment(.init(attachment)))
+        let attachment = MathAttachment(
+          latex: latex,
+          style: token.type == .mathBlock ? .block : .inline
+        )
+        return AttributedString("\u{FFFC}", attributes: attributes.attachment(.init(attachment)))
+      }
     }
-  }
+  #endif
 }
