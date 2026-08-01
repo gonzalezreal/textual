@@ -26,7 +26,10 @@ public struct RevealAnimation: Sendable, Hashable {
   /// at any instant. Intended range is 4...8, matching a subtle, non-per-letter reveal.
   public var clusterSize: Int
 
-  /// The width of the opacity/blur fade ramp, in glyphs.
+  /// The width of the opacity/blur fade ramp, in glyphs. Wider values keep more text — spanning
+  /// several words or lines — simultaneously mid-fade, reading as a broad, flowing wave rather
+  /// than a narrow moving band. `clusterSize` still governs the granularity of that gradient, so
+  /// widening this alone doesn't make the reveal chunkier, just longer.
   public var fadeWindow: Double
 
   /// The blur radius applied to glyphs while they're mid-fade. Tapers to zero as a cluster
@@ -52,7 +55,7 @@ public struct RevealAnimation: Sendable, Hashable {
   public init(
     glyphsPerSecond: Double = 45,
     clusterSize: Int = 6,
-    fadeWindow: Double = 9,
+    fadeWindow: Double = 80,
     blurRadius: CGFloat = 1,
     heightAnimation: Animation? = .easeOut(duration: 0.25),
     maxBacklogDuration: TimeInterval = 0.6,
