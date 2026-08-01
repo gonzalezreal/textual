@@ -8,27 +8,46 @@ import Foundation
 // target glyph count. `currentGlyphCount(at:)` is a pure function of that checkpoint and how much
 // time has elapsed, so no per-frame mutation is needed: TextFragment's TimelineView just calls it
 // with the current date each tick.
+//
+// `revealCeiling` (target + fadeWindow) — not the raw target — is what `currentGlyphCount` is
+// capped at. RevealTextRenderer's per-glyph progress is `(revealedGlyphCount - clusterStart) /
+// fadeWindow`: for a glyph near the end of short content, satisfying that requires
+// `revealedGlyphCount` to reach a bit past the content's actual length, not just up to it. Capping
+// at the raw target — as an earlier version of this code did — left trailing glyphs permanently
+// stuck below full opacity for any content shorter than fadeWindow.
+//
+// Padding the *clock's* ceiling like this (rather than clamping the *renderer's* fade window to
+// the target, as that earlier version also tried) matters for a second reason: it keeps
+// RevealTextRenderer's progress a function of `(clusterStart, revealedGlyphCount, fadeWindow)`
+// only — never of a "total" that can grow as more content streams in. A clamp keyed to a mutable
+// total is exactly what caused a real regression: an early glyph that had already reached full
+// opacity under a small total would silently drop back below full opacity the moment more content
+// extended that total, because the clamp's denominator grew retroactively for a `clusterStart` that
+// never moved. `revealCeiling` only grows monotonically with the target, and `revealedGlyphCount`
+// only grows monotonically per checkpoint, so a glyph's progress — a pure function of the two,
+// with clusterStart fixed once assigned — can never regress once it reaches full opacity.
 
 struct RevealState: Equatable {
   private(set) var anchorGlyphCount: Double = 0
   private(set) var anchorDate: Date = .distantPast
   private(set) var rate: Double = 0
   private(set) var targetGlyphCount: Int = 0
+  private(set) var revealCeiling: Double = 0
 
   /// The revealed glyph count at `date`, given the current checkpoint.
   func currentGlyphCount(at date: Date) -> Double {
     RevealClock.revealedGlyphCount(
       anchorGlyphCount: anchorGlyphCount,
-      target: Double(targetGlyphCount),
+      target: revealCeiling,
       rate: rate,
       elapsed: date.timeIntervalSince(anchorDate)
     )
   }
 
-  /// Whether the checkpoint has already fully drained toward the target — i.e. no ticking is
+  /// Whether the checkpoint has already fully drained toward the ceiling — i.e. no ticking is
   /// needed right now.
   var isCaughtUp: Bool {
-    anchorGlyphCount >= Double(targetGlyphCount)
+    anchorGlyphCount >= revealCeiling
   }
 
   /// Updates state in response to a content change, given how the content changed relative to
@@ -68,7 +87,7 @@ struct RevealState: Equatable {
   /// for a reason unrelated to the stream ending (Reduce Motion, `isEnabled == false`, or this
   /// fragment no longer being the active one) — see `fastFinish` for the stream-ending case.
   mutating func snapToFull() {
-    anchorGlyphCount = Double(targetGlyphCount)
+    anchorGlyphCount = revealCeiling
     anchorDate = .distantPast
     rate = 0
   }
@@ -77,7 +96,8 @@ struct RevealState: Equatable {
     target: Int, isStreamEnding: Bool, configuration: RevealAnimation, now: Date
   ) {
     let current = currentGlyphCount(at: now)
-    let backlog = max(0, Double(target) - current)
+    let newCeiling = Double(target) + configuration.fadeWindow
+    let backlog = max(0, newCeiling - current)
 
     rate = RevealClock.effectiveRate(
       backlogGlyphs: backlog, isStreamEnding: isStreamEnding, configuration: configuration
@@ -85,5 +105,6 @@ struct RevealState: Equatable {
     anchorGlyphCount = current
     anchorDate = now
     targetGlyphCount = target
+    revealCeiling = newCeiling
   }
 }

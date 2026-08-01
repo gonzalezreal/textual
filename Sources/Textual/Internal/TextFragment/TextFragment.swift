@@ -103,7 +103,6 @@ struct TextFragment<Content: AttributedStringProtocol>: View {
         text.textRenderer(
           RevealTextRenderer(
             revealedGlyphCount: revealState.currentGlyphCount(at: timeline.date),
-            totalGlyphCount: Double(revealState.targetGlyphCount),
             configuration: revealAnimation
           )
         )
@@ -111,10 +110,11 @@ struct TextFragment<Content: AttributedStringProtocol>: View {
     } else if shouldReveal {
       // Streaming but caught up right now — keep the renderer attached (a new burst may arrive
       // at any moment) without paying for a ticking TimelineView while there's nothing to drain.
+      // Use currentGlyphCount (the checkpoint's ceiling), not just the raw target — the ceiling
+      // pads past the target by fadeWindow so trailing glyphs actually reach full opacity here.
       text.textRenderer(
         RevealTextRenderer(
-          revealedGlyphCount: Double(revealState.targetGlyphCount),
-          totalGlyphCount: Double(revealState.targetGlyphCount),
+          revealedGlyphCount: revealState.currentGlyphCount(at: Date()),
           configuration: revealAnimation
         )
       )

@@ -15,16 +15,21 @@ import SwiftUI
 // There is no `flattenedRunSlices` helper — it isn't part of the SDK (every known reference
 // implementation of this pattern reimplements the Line -> Run -> RunSlice flattening themselves);
 // the nested loop below is the equivalent, without an intermediate allocation.
+//
+// `progress` is deliberately a pure function of only `clusterStart` (fixed once a glyph is
+// assigned an index), `revealedGlyphCount`, and `fadeWindow` — never of the content's total
+// length. An earlier version clamped a glyph's fade window to the total so short content could
+// still reach full opacity, but the total grows as more content streams in, and that clamp's
+// denominator grew retroactively for clusters whose `clusterStart` never moved — an
+// already-fully-revealed glyph could silently drop back below full opacity the moment more
+// content arrived. Keeping "short content should still reach full opacity" as RevealState's
+// concern (padding the reveal clock's ceiling past the target — see RevealState.swift) instead
+// keeps this formula monotonic: once a glyph reaches full opacity, it can never regress.
 
 struct RevealTextRenderer: TextRenderer, Animatable {
   /// The number of glyphs that should be fully or partially visible. Supplied as an
   /// already-computed instantaneous value by `TextFragment`'s `TimelineView`-driven clock.
   var revealedGlyphCount: Double
-
-  /// The total glyph count of the content being drawn — i.e. what `revealedGlyphCount` is
-  /// capped at once fully caught up. Used to keep a glyph's local fade window from extending
-  /// past the actual end of the content (see `progress(clusterStart:revealedGlyphCount:...)`).
-  let totalGlyphCount: Double
 
   let configuration: RevealAnimation
 
@@ -45,8 +50,7 @@ struct RevealTextRenderer: TextRenderer, Animatable {
           let progress = Self.progress(
             clusterStart: clusterStart,
             revealedGlyphCount: revealedGlyphCount,
-            fadeWindow: configuration.fadeWindow,
-            totalGlyphCount: totalGlyphCount
+            fadeWindow: configuration.fadeWindow
           )
 
           if progress <= 0 {
@@ -70,23 +74,15 @@ struct RevealTextRenderer: TextRenderer, Animatable {
     }
   }
 
-  /// The fade progress (0...1) for a glyph cluster starting at `clusterStart`, given how far
-  /// the reveal has advanced and the configured fade window.
-  ///
-  /// The window's far edge is clamped to `totalGlyphCount`, so a cluster's local fade window
-  /// never extends past where the content actually ends. Without this, content shorter than
-  /// `fadeWindow` — or the trailing cluster of any content — could never reach full opacity:
-  /// `revealedGlyphCount` is capped at `totalGlyphCount` once caught up, but an unclamped window
-  /// could require it to travel further than the content is long to reach progress 1.
+  /// The fade progress (0...1) for a glyph cluster starting at `clusterStart`, given how far the
+  /// reveal has advanced and the configured fade window. Monotonically non-decreasing in
+  /// `revealedGlyphCount` for a fixed `clusterStart` — see the file overview for why that matters.
   static func progress(
     clusterStart: Double,
     revealedGlyphCount: Double,
-    fadeWindow: Double,
-    totalGlyphCount: Double
+    fadeWindow: Double
   ) -> Double {
-    let windowEnd = min(clusterStart + fadeWindow, totalGlyphCount)
-    let windowWidth = max(windowEnd - clusterStart, 1)
-    let rawProgress = (revealedGlyphCount - clusterStart) / windowWidth
+    let rawProgress = (revealedGlyphCount - clusterStart) / max(fadeWindow, 1)
     return smoothstep(clamp(rawProgress, to: 0...1))
   }
 }
@@ -107,13 +103,7 @@ private func clamp(_ x: Double, to range: ClosedRange<Double>) -> Double {
       "The quick brown fox jumps over the lazy dog, revealing itself one small cluster of glyphs at a time."
     )
     .font(.title3)
-    .textRenderer(
-      RevealTextRenderer(
-        revealedGlyphCount: revealedGlyphCount,
-        totalGlyphCount: 110,
-        configuration: .default
-      )
-    )
+    .textRenderer(RevealTextRenderer(revealedGlyphCount: revealedGlyphCount, configuration: .default))
 
     Slider(value: $revealedGlyphCount, in: 0...110)
   }
