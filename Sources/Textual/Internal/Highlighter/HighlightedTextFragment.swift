@@ -40,6 +40,7 @@ struct HighlightedTextFragment: View {
       .onChange(of: Tuple(model.tokens, textEnvironment)) { _, newValue in
         model.highlight(
           tokens: newValue.values.0,
+          original: content,
           presentationIntent: content.presentationIntent,
           using: theme,
           environment: newValue.values.1
@@ -64,6 +65,7 @@ extension HighlightedTextFragment {
 
     func highlight(
       tokens: [CodeToken],
+      original: AttributedSubstring,
       presentationIntent: PresentationIntent?,
       using theme: StructuredText.HighlighterTheme,
       environment: TextEnvironmentValues
@@ -75,13 +77,34 @@ extension HighlightedTextFragment {
         .apply(in: &attributes, environment: environment)
       var highlightedCode = AttributedString()
 
+      // Walk the ORIGINAL attributed content in parallel with the tokens and
+      // slice it, rather than rebuilding each token from its plain String.
+      // Rebuilding discards every attribute the caller's `MarkupParser` applied
+      // before it can reach the screen. Theme attributes are merged on top, so
+      // syntax colouring still wins for the keys it sets while caller attributes
+      // survive for the rest.
+      let total = original.characters.count
+      var consumed = 0
+
       for token in tokens {
-        var content = AttributedString(token.content)
         var tokenAttributes = attributes
 
         if let tokenProperties = theme.tokenProperties[token.type] {
           tokenProperties.apply(in: &tokenAttributes, environment: environment)
         }
+
+        let length = token.content.count
+        var content: AttributedString
+        if consumed + length <= total {
+          let lower = original.index(original.startIndex, offsetByCharacters: consumed)
+          let upper = original.index(original.startIndex, offsetByCharacters: consumed + length)
+          content = AttributedString(original[lower..<upper])
+        } else {
+          // Tokenizer disagreed with the source length; fall back to the plain
+          // token so text is never lost, accepting the attribute loss.
+          content = AttributedString(token.content)
+        }
+        consumed += length
 
         content.mergeAttributes(tokenAttributes)
         highlightedCode.append(content)
