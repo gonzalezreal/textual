@@ -124,6 +124,10 @@
     }
 
     func isPositionAtBlockBoundary(_ position: TextPosition) -> Bool {
+      guard contains(position) else {
+        return false
+      }
+
       if position
         == TextPosition(
           indexPath: .init(layout: position.indexPath.layout),

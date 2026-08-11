@@ -199,6 +199,23 @@
     }
 
     @Test
+    func stalePositionsAfterLayoutBecomesEmpty() throws {
+      // given
+      let model = try TextSelectionModel(fixtureName: "two-paragraphs-bidi")
+      let staleStart = model.startPosition
+      let staleEnd = model.endPosition
+
+      // when
+      model.setLayoutCollection(EmptyTextLayoutCollection())
+
+      // then
+      #expect(model.position(from: staleStart, offset: 0) == nil)
+      #expect(model.offset(from: staleStart, to: staleEnd) == 0)
+      #expect(model.isPositionAtBlockBoundary(staleStart) == false)
+      #expect(model.isPositionAtBlockBoundary(staleEnd) == false)
+    }
+
+    @Test
     func firstRectCollapsedRange() throws {
       // given
       let model = try TextSelectionModel(fixtureName: "two-paragraphs-bidi")
