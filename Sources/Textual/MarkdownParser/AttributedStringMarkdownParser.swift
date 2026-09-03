@@ -22,6 +22,28 @@ public struct AttributedStringMarkdownParser: MarkupParser {
     self.processor = PatternProcessor(syntaxExtensions: syntaxExtensions)
   }
 
+  public var cacheKey: AnyHashable {
+    Key(
+      baseURL: baseURL,
+      interpretedSyntax: options.interpretedSyntax,
+      failurePolicy: options.failurePolicy,
+      languageCode: options.languageCode,
+      allowsExtendedAttributes: options.allowsExtendedAttributes,
+      appliesSourcePositionAttributes: options.appliesSourcePositionAttributes,
+      syntaxExtensions: processor.cacheKeys
+    )
+  }
+
+  private struct Key: Hashable {
+    let baseURL: URL?
+    let interpretedSyntax: AttributedString.MarkdownParsingOptions.InterpretedSyntax
+    let failurePolicy: AttributedString.MarkdownParsingOptions.FailurePolicy
+    let languageCode: String?
+    let allowsExtendedAttributes: Bool
+    let appliesSourcePositionAttributes: Bool
+    let syntaxExtensions: [AnyHashable]
+  }
+
   public func attributedString(for input: String) throws -> AttributedString {
     try processor.expand(
       AttributedString(

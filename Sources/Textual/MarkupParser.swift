@@ -30,9 +30,21 @@ import Foundation
 /// missing or inconsistent intents will typically show up as incorrect block rendering.
 @MainActor
 public protocol MarkupParser {
+  /// Identifies this parser's configuration, so a cached parse is reused only for the same one.
+  ///
+  /// Defaults to the parser's type. A parser with settings of its own (a base URL, options, extensions) should
+  /// fold them in, or a view that keeps its markup but changes the parser shows the previous parse.
+  var cacheKey: AnyHashable { get }
+
   /// Returns attributed content for the given input string.
   ///
   /// - Parameter input: The markup source string.
   /// - Returns: An attributed string representing the parsed markup.
   func attributedString(for input: String) throws -> AttributedString
+}
+
+extension MarkupParser {
+  public var cacheKey: AnyHashable {
+    ObjectIdentifier(Self.self)
+  }
 }

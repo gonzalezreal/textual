@@ -3,6 +3,8 @@ import Foundation
 extension AttributedStringMarkdownParser {
   /// A syntax extension that replaces matched tokens after Markdown parsing.
   public struct SyntaxExtension {
+    /// What the extension was made from; two extensions with the same key parse the same way.
+    let cacheKey: AnyHashable
     let patterns: [PatternTokenizer.Pattern]
     let replace:
       (
@@ -16,7 +18,7 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
   /// Replaces `:shortcode:` sequences using the provided custom emoji definitions.
   public static func emoji(_ emoji: Set<Emoji>) -> Self {
     guard !emoji.isEmpty else {
-      return Self(patterns: [], replace: { _, _ in nil })
+      return Self(cacheKey: "emoji", patterns: [], replace: { _, _ in nil })
     }
 
     let emojiMap = Dictionary(
@@ -25,7 +27,7 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       }
     )
 
-    return Self(patterns: [.emoji]) { token, attributes in
+    return Self(cacheKey: "emoji:" + emoji.map(\.shortcode).sorted().joined(separator: ","), patterns: [.emoji]) { token, attributes in
       guard let shortcode = token.capturedContent, let emoji = emojiMap[shortcode] else {
         return nil
       }
@@ -39,7 +41,7 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
 
   /// Replaces inline and block math expressions with attachments.
   public static var math: Self {
-    .init(patterns: [.mathBlock, .mathInline]) { token, attributes in
+    .init(cacheKey: "math", patterns: [.mathBlock, .mathInline]) { token, attributes in
       guard let latex = token.capturedContent else {
         return nil
       }

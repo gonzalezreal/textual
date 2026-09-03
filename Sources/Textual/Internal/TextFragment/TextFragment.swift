@@ -26,8 +26,27 @@ import SwiftUI
 // attributed content with inline attachments, links, and selection.
 
 struct TextFragment<Content: AttributedStringProtocol>: View {
+  /// Memoizes the `TextBuilder` for the current content so `body` can derive it directly.
+  @MainActor
+  final class BuilderCache {
+    private var content: Content?
+    private var environment: TextEnvironmentValues?
+    private var builder: TextBuilder?
+
+    func builder(for content: Content, environment: TextEnvironmentValues) -> TextBuilder {
+      if let builder, content == self.content, environment == self.environment {
+        return builder
+      }
+      let builder = TextBuilder(content, environment: environment)
+      self.content = content
+      self.environment = environment
+      self.builder = builder
+      return builder
+    }
+  }
+
   @Environment(\.textEnvironment) private var textEnvironment
-  @State private var textBuilder: TextBuilder?
+  @State private var builderCache = BuilderCache()
 
   private let content: Content
 
@@ -36,22 +55,16 @@ struct TextFragment<Content: AttributedStringProtocol>: View {
   }
 
   var body: some View {
-    text
+    builderCache.builder(for: content, environment: textEnvironment).text
       .customAttribute(TextFragmentAttribute())
       .onGeometryChange(for: CGSize?.self, of: \.textContainerSize) { size in
-        guard let size, let textBuilder else { return }
-        textBuilder.sizeChanged(size, environment: textEnvironment)
-      }
-      .onChange(of: content, initial: true) { _, newValue in
-        self.textBuilder = TextBuilder(newValue, environment: textEnvironment)
+        guard let size else { return }
+        builderCache.builder(for: content, environment: textEnvironment)
+          .sizeChanged(size, environment: textEnvironment)
       }
       .modifier(TextSelectionBackground())
       .modifier(AttachmentOverlay(attachments: content.attachments()))
       .modifier(TextLinkInteraction())
-  }
-
-  private var text: Text {
-    textBuilder?.text ?? Text(verbatim: "")
   }
 }
 

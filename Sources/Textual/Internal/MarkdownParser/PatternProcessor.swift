@@ -21,6 +21,10 @@ extension AttributedStringMarkdownParser {
       self.tokenizer = PatternTokenizer(patterns: syntaxExtensions.flatMap(\.patterns))
     }
 
+    var cacheKeys: [AnyHashable] {
+      syntaxExtensions.map(\.cacheKey)
+    }
+
     func expand(_ attributedString: AttributedString) throws -> AttributedString {
       guard !syntaxExtensions.isEmpty else {
         return attributedString
