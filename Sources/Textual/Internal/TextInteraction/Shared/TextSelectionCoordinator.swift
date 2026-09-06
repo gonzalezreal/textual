@@ -40,12 +40,15 @@ import SwiftUI
 
 struct TextSelectionCoordination: ViewModifier {
   #if TEXTUAL_ENABLE_TEXT_SELECTION
+    @Environment(TextSelectionCoordinator.self) private var inherited: TextSelectionCoordinator?
     @State private var coordinator = TextSelectionCoordinator()
   #endif
 
   func body(content: Content) -> some View {
     #if TEXTUAL_ENABLE_TEXT_SELECTION
-      content.environment(coordinator)
+      // A coordinator set up further out keeps the whole subtree to one selection; only without one does the
+      // view coordinate its own paragraphs.
+      content.environment(inherited ?? coordinator)
     #else
       content
     #endif

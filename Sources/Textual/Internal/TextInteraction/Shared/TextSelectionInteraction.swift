@@ -17,13 +17,15 @@ struct TextSelectionInteraction: ViewModifier {
     @Environment(TextSelectionCoordinator.self) private var coordinator: TextSelectionCoordinator?
 
     @State private var model = TextSelectionModel()
+    @State private var contentSize = CGSize.zero
   #endif
 
   func body(content: Content) -> some View {
     #if TEXTUAL_ENABLE_TEXT_SELECTION
       if textSelection.allowsSelection {
         content
-          .overlayTextLayoutCollection { layoutCollection in
+          .onGeometryChange(for: CGSize.self, of: \.size) { contentSize = $0 }
+          .overlayTextLayoutCollection(size: contentSize) { layoutCollection in
             Color.clear
               .onChange(of: AnyTextLayoutCollection(layoutCollection), initial: true) {
                 model.setCoordinator(coordinator)

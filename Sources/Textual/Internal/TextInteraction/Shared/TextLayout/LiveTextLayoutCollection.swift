@@ -13,7 +13,12 @@
     }
 
     func isEqual(to other: any TextLayoutCollection) -> Bool {
-      base == (other as? LiveTextLayoutCollection)?.base
+      guard let other = other as? LiveTextLayoutCollection else {
+        return false
+      }
+      // Lazy containers measure their content in passes that have no width yet; the layouts published from such a
+      // pass have no lines, and only the size tells them apart from the ones of the pass that follows.
+      return base == other.base && geometry.size == other.geometry.size
     }
 
     func needsPositionReconciliation(with other: any TextLayoutCollection) -> Bool {

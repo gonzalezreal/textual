@@ -7,11 +7,12 @@
   extension Snapshotting where Value: SwiftUI.View, Format == String {
     @MainActor
     static func textLayoutCollection(config: ViewImageConfig = .iPhoneSe) -> Snapshotting {
-      return Snapshotting<CodableTextLayoutCollection, String>.json
-        .asyncPullback { (view: Value) -> Async<CodableTextLayoutCollection> in
+      // Named first: chained directly, the compiler picks the `json(_:)` overload and finds no `asyncPullback`.
+      let json: Snapshotting<CodableTextLayoutCollection, String> = .json
+      return json.asyncPullback { (view: Value) -> Async<CodableTextLayoutCollection> in
           // Capture layout from view
           var capturedLayoutCollection: (any TextLayoutCollection)?
-          let viewWithCapture = view.overlayTextLayoutCollection { layoutCollection in
+          let viewWithCapture = view.overlayTextLayoutCollection(size: config.size ?? .zero) { layoutCollection in
             capturedLayoutCollection = layoutCollection
             return Color.clear
           }

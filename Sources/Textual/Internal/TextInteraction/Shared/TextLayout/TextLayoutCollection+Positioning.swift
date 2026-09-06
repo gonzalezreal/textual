@@ -3,29 +3,32 @@
 
   extension TextLayoutCollection {
     var startPosition: TextPosition {
-      TextPosition(
-        indexPath: .init(runSlice: 0, run: 0, line: 0, layout: 0),
-        affinity: layouts.count > 0 ? .downstream : .upstream
-      )
+      // The first layout can be empty (a blank paragraph, say); the document starts at the first slice there is.
+      for (layoutIndex, layout) in layouts.enumerated() {
+        for (lineIndex, line) in layout.lines.enumerated() {
+          for (runIndex, run) in line.runs.enumerated() where !run.slices.isEmpty {
+            return TextPosition(
+              indexPath: .init(runSlice: 0, run: runIndex, line: lineIndex, layout: layoutIndex),
+              affinity: .downstream
+            )
+          }
+        }
+      }
+      return TextPosition(indexPath: .init(runSlice: 0, run: 0, line: 0, layout: 0), affinity: .upstream)
     }
 
     var endPosition: TextPosition {
-      guard
-        let layout = layouts.last,
-        let line = layout.lines.last,
-        let run = line.runs.last
-      else {
-        return startPosition
+      for (layoutIndex, layout) in layouts.enumerated().reversed() {
+        for (lineIndex, line) in layout.lines.enumerated().reversed() {
+          for (runIndex, run) in line.runs.enumerated().reversed() where !run.slices.isEmpty {
+            return TextPosition(
+              indexPath: .init(runSlice: run.slices.endIndex - 1, run: runIndex, line: lineIndex, layout: layoutIndex),
+              affinity: .upstream
+            )
+          }
+        }
       }
-      return TextPosition(
-        indexPath: .init(
-          runSlice: run.slices.endIndex - 1,
-          run: line.runs.endIndex - 1,
-          line: layout.lines.endIndex - 1,
-          layout: layouts.endIndex - 1
-        ),
-        affinity: .upstream
-      )
+      return startPosition
     }
 
     func position(from position: TextPosition, offset: Int) -> TextPosition? {
@@ -75,15 +78,25 @@
     }
 
     func localCharacterRange(at indexPath: IndexPath) -> Range<Int> {
-      let line = layouts[indexPath.layout].lines[indexPath.line]
-      return line.runs[indexPath.run]
-        .slices[indexPath.runSlice]
-        .characterRange
+      // A layout without lines (an empty paragraph) has no slice to name; the position is its start.
+      guard let slice = runSlice(at: indexPath) else {
+        return 0..<0
+      }
+      return slice.characterRange
     }
 
     func layoutDirection(at indexPath: IndexPath) -> LayoutDirection {
-      let line = layouts[indexPath.layout].lines[indexPath.line]
-      return line.runs[indexPath.run].layoutDirection
+      guard let line = layouts[safe: indexPath.layout]?.lines[safe: indexPath.line],
+        let run = line.runs[safe: indexPath.run]
+      else {
+        return .leftToRight
+      }
+      return run.layoutDirection
+    }
+
+    private func runSlice(at indexPath: IndexPath) -> (any TextRunSlice)? {
+      layouts[safe: indexPath.layout]?.lines[safe: indexPath.line]?.runs[safe: indexPath.run]?
+        .slices[safe: indexPath.runSlice]
     }
 
     func position(at layoutIndex: Int, localCharacterIndex: Int) -> TextPosition? {
@@ -305,6 +318,11 @@
         at: position.indexPath.layout,
         localCharacterIndex: other.localCharacterIndex(at: position)
       )
+    }
+  }
+  extension Array {
+    fileprivate subscript(safe index: Int) -> Element? {
+      indices.contains(index) ? self[index] : nil
     }
   }
 #endif

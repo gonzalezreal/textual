@@ -14,6 +14,8 @@
     var model: TextSelectionModel
     var exclusionRects: [CGRect]
     var openURL: OpenURLAction
+    /// Actions the app adds to the selection menu, after the platform's own.
+    var selectionActions: [TextSelectionAction]
 
     override var acceptsFirstResponder: Bool { true }
     override var isFlipped: Bool { true }
@@ -21,12 +23,15 @@
 
     private var dragStart: TextPosition?
     private var selectionAnchor: TextPosition?
+    private var outsideClickMonitor: Any?
 
     init(
       model: TextSelectionModel,
       exclusionRects: [CGRect],
-      openURL: OpenURLAction
+      openURL: OpenURLAction,
+      selectionActions: [TextSelectionAction] = []
     ) {
+      self.selectionActions = selectionActions
       self.model = model
       self.exclusionRects = exclusionRects
       self.openURL = openURL
@@ -218,6 +223,18 @@
           keyEquivalent: ""
         )
       )
+      if !selectionActions.isEmpty {
+        contextMenu.addItem(.separator())
+        for action in selectionActions {
+          let item = NSMenuItem(title: action.title, action: #selector(performSelectionAction(_:)), keyEquivalent: "")
+          item.target = self
+          item.representedObject = action
+          if let systemImage = action.systemImage {
+            item.image = NSImage(systemSymbolName: systemImage, accessibilityDescription: nil)
+          }
+          contextMenu.addItem(item)
+        }
+      }
 
       return contextMenu
     }
@@ -257,6 +274,40 @@
       selectionAnchor = nil
     }
 
+    /// A selection lives as long as its view is first responder, as it does in a text view.
+    override func resignFirstResponder() -> Bool {
+      let resigned = super.resignFirstResponder()
+      if resigned {
+        resetSelection()
+      }
+      return resigned
+    }
+
+    override func viewDidMoveToWindow() {
+      super.viewDidMoveToWindow()
+      if let outsideClickMonitor {
+        NSEvent.removeMonitor(outsideClickMonitor)
+        self.outsideClickMonitor = nil
+      }
+      guard window != nil else {
+        return
+      }
+      outsideClickMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
+        self?.dismissSelection(forClickIn: event)
+        return event
+      }
+    }
+
+    /// Ends the selection for a click anywhere in the window but on this view; clicks on the view are its own business.
+    func dismissSelection(forClickIn event: NSEvent) {
+      guard model.selectedRange != nil, event.window === window,
+        !bounds.contains(convert(event.locationInWindow, from: nil))
+      else {
+        return
+      }
+      resetSelection()
+    }
+
     @objc private func share(_ sender: Any?) {
       guard let selectedRange = model.selectedRange else {
         return
@@ -273,6 +324,16 @@
 
       sharingPicker.show(relativeTo: rect, of: self, preferredEdge: .maxY)
     }
+
+    @objc private func performSelectionAction(_ sender: NSMenuItem) {
+      guard let selectedRange = model.selectedRange, !selectedRange.isCollapsed,
+        let action = sender.representedObject as? TextSelectionAction
+      else {
+        return
+      }
+      action.handler(Formatter(model.attributedText(in: selectedRange)).plainText())
+    }
+
 
     @objc private func copy(_ sender: Any?) {
       guard let selectedRange = model.selectedRange else {
