@@ -24,7 +24,8 @@
         model: model,
         exclusionRects: overflowFrames,
         openURL: context.environment.openURL,
-        selectionActions: context.environment.textSelectionActions
+        selectionActions: context.environment.textSelectionActions,
+        selectionActionProminence: context.environment.textSelectionActionProminence
       )
     }
 
@@ -33,6 +34,7 @@
       uiView.exclusionRects = overflowFrames
       uiView.openURL = context.environment.openURL
       uiView.selectionActions = context.environment.textSelectionActions
+      uiView.selectionActionProminence = context.environment.textSelectionActionProminence
     }
   }
 #endif

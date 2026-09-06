@@ -27,6 +27,19 @@ public struct TextSelectionAction: Identifiable, Sendable {
   }
 }
 
+/// Where an app's actions sit on the selection menu relative to the system's.
+public enum TextSelectionActionProminence: Sendable, Hashable {
+  /// After the platform's edit actions, wherever the system puts them.
+  case standard
+  /// Right after Copy, ahead of the system's assistant entry, which moves to the end of the menu.
+  ///
+  /// On iOS 27 the assistant entry takes a slot on the menu's first page, which is short enough that
+  /// an app's own item can end up behind the overflow chevron. Prominent actions come first instead.
+  /// The macOS menu has no such entry, so there the two cases read the same.
+  case prominent
+}
+
 extension EnvironmentValues {
   @Entry var textSelectionActions: [TextSelectionAction] = []
+  @Entry var textSelectionActionProminence: TextSelectionActionProminence = .standard
 }

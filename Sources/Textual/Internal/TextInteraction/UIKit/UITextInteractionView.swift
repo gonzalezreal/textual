@@ -22,6 +22,7 @@
     var openURL: OpenURLAction
     /// Actions the app adds to the selection menu, after the platform's own.
     var selectionActions: [TextSelectionAction]
+    var selectionActionProminence: TextSelectionActionProminence
 
     weak var inputDelegate: (any UITextInputDelegate)?
 
@@ -35,9 +36,11 @@
       model: TextSelectionModel,
       exclusionRects: [CGRect],
       openURL: OpenURLAction,
-      selectionActions: [TextSelectionAction] = []
+      selectionActions: [TextSelectionAction] = [],
+      selectionActionProminence: TextSelectionActionProminence = .standard
     ) {
       self.selectionActions = selectionActions
+      self.selectionActionProminence = selectionActionProminence
       self.model = model
       self.exclusionRects = exclusionRects
       self.openURL = openURL
@@ -97,6 +100,13 @@
         UIMenu(options: .displayInline, children: actions),
         atEndOfMenu: .standardEdit
       )
+      guard selectionActionProminence == .prominent else {
+        return
+      }
+      // The assistant entry is a responder command, so it is found by what it does, not by a private identifier.
+      builder.replaceChildren(ofMenu: .root) { children in
+        children.movingAssistantEntryLast()
+      }
     }
 
     override func copy(_ sender: Any?) {
@@ -256,6 +266,28 @@
       shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
     ) -> Bool {
       gestureRecognizer === outsideTapRecognizer
+    }
+  }
+  extension UIMenuElement {
+    /// Whether this element opens the system's writing assistant.
+    fileprivate var isAssistantEntry: Bool {
+      guard #available(iOS 18.2, *), let command = self as? UICommand else {
+        return false
+      }
+      return command.action == #selector(UIResponder.showWritingTools(_:))
+    }
+  }
+
+  extension [UIMenuElement] {
+    /// The same elements with the assistant entry last, at this level and inside every menu, so that Copy and the
+    /// app's own items keep their places wherever the system happens to file the entry.
+    fileprivate func movingAssistantEntryLast() -> [UIMenuElement] {
+      let reordered = map { element in
+        (element as? UIMenu).map { menu in
+          menu.replacingChildren(menu.children.movingAssistantEntryLast())
+        } ?? element
+      }
+      return reordered.filter { !$0.isAssistantEntry } + reordered.filter { $0.isAssistantEntry }
     }
   }
 #endif

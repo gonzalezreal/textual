@@ -164,10 +164,19 @@ extension TextualNamespace where Base: View {
   /// The platform's own selection menu (copy, share, look up, translate) stays as it is; these
   /// actions are appended to it and receive the selected text when chosen. They only take effect
   /// where selection is enabled with ``textSelection(_:)``.
+  ///
+  /// - Parameters:
+  ///   - actions: The actions to add, in the order they appear.
+  ///   - prominence: Where they sit relative to the system's; see ``TextSelectionActionProminence``.
   @available(tvOS, unavailable)
   @available(watchOS, unavailable)
-  public func textSelectionActions(_ actions: [TextSelectionAction]) -> some View {
-    base.environment(\.textSelectionActions, actions)
+  public func textSelectionActions(
+    _ actions: [TextSelectionAction],
+    prominence: TextSelectionActionProminence = .standard
+  ) -> some View {
+    base
+      .environment(\.textSelectionActions, actions)
+      .environment(\.textSelectionActionProminence, prominence)
   }
 
   /// Keeps to one text selection across all the selectable text below this view.
