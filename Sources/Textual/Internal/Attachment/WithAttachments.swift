@@ -53,6 +53,8 @@ extension WithAttachments {
       emojiAttachmentLoader: any AttachmentLoader,
       environment: ColorEnvironmentValues
     ) async {
+      resolvedAttributedString = nil
+
       guard attributedString.containsValues(for: [\.imageURL, \.textual.emojiURL]) else {
         return
       }
@@ -92,6 +94,11 @@ extension WithAttachments {
           ranges.append(range)
         }
       }
+
+      // Cancelling this task (SwiftUI restarts `.task(id:)` when the string changes) doesn't
+      // interrupt the task group's suspended children, so a cancelled task still reaches this
+      // point with stale results. Discard them instead of overwriting the newer string.
+      guard !Task.isCancelled else { return }
 
       resolveAttachmentsFinished(
         attributedString: attributedString,
