@@ -51,7 +51,15 @@ struct TextFragment<Content: AttributedStringProtocol>: View {
   }
 
   private var text: Text {
-    textBuilder?.text ?? Text(verbatim: "")
+    guard let textBuilder else {
+      return Text(verbatim: "")
+    }
+
+    guard let accessibilityLabel = textBuilder.accessibilityLabel else {
+      return textBuilder.text
+    }
+
+    return textBuilder.text.accessibilityLabel(Text(verbatim: accessibilityLabel))
   }
 }
 

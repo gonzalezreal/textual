@@ -43,6 +43,13 @@ public protocol Attachment: Sendable, Hashable, CustomStringConvertible {
   /// Implement this to provide PNG-encoded data for serialization, copy/paste,
   /// or export workflows. The default implementation returns `nil`.
   func pngData() -> Data?
+
+  /// The text assistive technologies read in place of the attachment.
+  ///
+  /// Textual draws attachments over unlabeled placeholders, so VoiceOver skips them. When an
+  /// attachment returns a label, VoiceOver reads the surrounding text with the label in the
+  /// attachment's place. The default implementation returns `nil`.
+  var accessibilityLabel: String? { get }
 }
 
 extension Attachment {
@@ -55,6 +62,10 @@ extension Attachment {
   }
 
   public func pngData() -> Data? {
+    nil
+  }
+
+  public var accessibilityLabel: String? {
     nil
   }
 }
@@ -104,6 +115,10 @@ public struct AnyAttachment: Attachment {
 
   public func pngData() -> Data? {
     base.pngData()
+  }
+
+  public var accessibilityLabel: String? {
+    base.accessibilityLabel
   }
 
   public static func == (lhs: Self, rhs: Self) -> Bool {

@@ -19,6 +19,8 @@ import SwiftUI
 extension TextFragment {
   @MainActor @Observable final class TextBuilder {
     var text: Text
+    /// The text with each attachment's accessibility label in its place, when any attachment has one
+    @ObservationIgnored let accessibilityLabel: String?
 
     @ObservationIgnored private let content: Content
     @ObservationIgnored private let cache: NSCache<KeyBox<[AttachmentKey: CGSize]>, Box<Text>>
@@ -32,6 +34,7 @@ extension TextFragment {
         in: environment
       )
       self.content = content
+      self.accessibilityLabel = content.accessibilityLabel()
       self.cache = NSCache()
       self.cache.countLimit = 10
 
@@ -107,6 +110,25 @@ extension Text {
 }
 
 extension AttributedStringProtocol {
+  fileprivate func accessibilityLabel() -> String? {
+    var hasLabel = false
+    let label = runs.map { run in
+      guard let attachment = run.textual.attachment else {
+        return String(self[run.range].characters)
+      }
+
+      guard let label = attachment.accessibilityLabel else {
+        return ""
+      }
+
+      hasLabel = true
+      return label
+    }
+    .joined()
+
+    return hasLabel ? label : nil
+  }
+
   fileprivate func attachmentSizes(
     for proposal: ProposedViewSize, in environment: TextEnvironmentValues
   ) -> [AttachmentKey: CGSize] {
