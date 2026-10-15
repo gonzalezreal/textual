@@ -32,6 +32,24 @@
         assertSnapshot(of: view, as: .textualImage(layout: layout))
       }
 
+      @Test func gitHubStyle() {
+        let view = StructuredText(
+          markdown: """
+            # Heading 1
+            The sky above the port was the color of television, tuned to a dead channel.
+            ## Heading 2
+            The sky above the port was the color of television, tuned to a dead channel.
+            ### Heading 3
+            The sky above the port was the color of television, tuned to a dead channel.
+            """
+        )
+        .textual.headingStyle(.gitHub)
+        .textual.paragraphStyle(.gitHub)
+        .background(Color.guide)
+        .padding(.horizontal)
+        assertSnapshot(of: view, as: .textualImage(layout: layout))
+      }
+
       @Test func inlines() {
         let view = StructuredText(
           markdown: """

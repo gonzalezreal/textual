@@ -13,18 +13,17 @@ extension StructuredText {
     }
 
     var body: some View {
-      let configuration = BlockStyleConfiguration(
-        label: .init(
-          BlockContent(
-            parent: intent,
-            content: content
-          )
-        ),
-        indentationLevel: indentationLevel
-      )
-      let resolvedStyle = blockQuoteStyle.resolve(configuration: configuration)
+      Group(subviews: BlockContent(parent: intent, content: content)) { label in
+        let configuration = BlockStyleConfiguration(
+          label: .init(label),
+          indentationLevel: indentationLevel
+        )
+        let resolvedStyle = blockQuoteStyle.resolve(configuration: configuration)
 
-      AnyView(resolvedStyle)
+        AnyView(resolvedStyle)
+          // The style can place the label inside a container, which hides its spacing
+          .containerValue(\.nestedBlockSpacing, label.blockSpacing)
+      }
     }
 
     private var indentationLevel: Int {

@@ -64,19 +64,18 @@ extension StructuredText {
     }
 
     var body: some View {
-      let configuration = ListItemStyleConfiguration(
-        marker: .init(marker),
-        block: .init(
-          BlockContent(
-            parent: intent,
-            content: content
-          )
-        ),
-        indentationLevel: indentationLevel
-      )
-      let resolvedStyle = listItemStyle.resolve(configuration: configuration)
+      Group(subviews: BlockContent(parent: intent, content: content)) { block in
+        let configuration = ListItemStyleConfiguration(
+          marker: .init(marker),
+          block: .init(block),
+          indentationLevel: indentationLevel
+        )
+        let resolvedStyle = listItemStyle.resolve(configuration: configuration)
 
-      AnyView(resolvedStyle)
+        AnyView(resolvedStyle)
+          // The style can place the block inside a container, which hides its spacing
+          .containerValue(\.nestedBlockSpacing, block.blockSpacing)
+      }
     }
 
     private var marker: some View {

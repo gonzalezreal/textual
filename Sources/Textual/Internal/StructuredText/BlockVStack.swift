@@ -8,6 +8,9 @@ import SwiftUI
 //
 // List items can override block spacing with environment-driven list item spacing for consistent
 // spacing within lists regardless of individual block preferences.
+//
+// The stack passes the spacing of its blocks on to the block that contains it, so a list or a
+// block quote has the spacing of its content from the first layout pass.
 
 extension StructuredText {
   struct BlockVStack<Content: View>: View {
@@ -26,6 +29,7 @@ extension StructuredText {
             BlockLayoutView($0)
           }
         }
+        .containerValue(\.nestedBlockSpacing, children.blockSpacing)
       }
     }
   }
@@ -36,26 +40,34 @@ extension StructuredText {
     static let defaultValue: TextAlignment? = nil
   }
 
-  fileprivate struct BlockLayoutView<Content: View>: View {
+  fileprivate struct BlockLayoutView: View {
     @Environment(\.listItemSpacingEnabled) private var listItemSpacingEnabled
     @Environment(\.resolvedListItemSpacing) private var resolvedListItemSpacing
 
-    @State private var blockSpacing = BlockSpacing()
+    @State private var preferredBlockSpacing: BlockSpacing?
 
-    private let content: Content
+    private let content: Subview
 
-    init(_ content: Content) {
+    init(_ content: Subview) {
       self.content = content
     }
 
     var body: some View {
-      // Read the block spacing preference and apply it as a layout value
       content
         .onPreferenceChange(BlockSpacingKey.self) { @MainActor value in
-          // Override with the resolved list item spacing if enabled
-          blockSpacing = listItemSpacingEnabled ? resolvedListItemSpacing : value
+          preferredBlockSpacing = value
         }
         .layoutValue(key: BlockSpacingKey.self, value: blockSpacing)
+    }
+
+    private var blockSpacing: BlockSpacing {
+      // Override with the resolved list item spacing if enabled
+      if listItemSpacingEnabled {
+        return resolvedListItemSpacing
+      }
+      // The preference also covers spacing set inside containers, but it arrives after the first
+      // layout pass, so until then use the spacing from the container values
+      return preferredBlockSpacing ?? content.blockSpacing
     }
   }
 
