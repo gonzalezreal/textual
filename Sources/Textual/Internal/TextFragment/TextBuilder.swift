@@ -96,8 +96,24 @@ extension Text {
       return text
     }
 
-    self = textValues.reduce(Text(verbatim: "")) { partialResult, text in
-      partialResult + text
+    self = Text(concatenating: textValues[...])
+  }
+
+  // SwiftUI resolves a concatenated Text recursively, a few stack frames per `+`.
+  // Folding runs left to right nests them one level per run, so a block with a
+  // few hundred runs (e.g., syntax-highlighted code) exhausts the 1 MB main-thread
+  // stack on iOS. Joining them as a balanced tree keeps the depth logarithmic.
+  private init(concatenating texts: ArraySlice<Text>) {
+    switch texts.count {
+    case 0:
+      self.init(verbatim: "")
+    case 1:
+      self = texts[texts.startIndex]
+    default:
+      let middle = texts.startIndex + texts.count / 2
+      self =
+        Text(concatenating: texts[..<middle])
+        + Text(concatenating: texts[middle...])
     }
   }
 
