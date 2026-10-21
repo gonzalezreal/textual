@@ -8,12 +8,12 @@
   struct TextBuilderTests {
     @Test func renderingManyAttributedRunsDoesNotOverflowStack() {
       let renderer = ImageRenderer(
-        content: TextFragment(Self.attributedStringWithManyRuns(count: 2_500))
+        content: TextFragment(Self.attributedStringWithManyRuns(count: 20_000))
           .frame(width: 320)
           .fixedSize(horizontal: false, vertical: true)
           .coordinateSpace(.textContainer)
       )
-      renderer.proposedSize = .init(width: 320, height: 4_000)
+      renderer.proposedSize = .init(width: 320, height: 40_000)
 
       #expect(renderer.nsImage != nil)
     }
