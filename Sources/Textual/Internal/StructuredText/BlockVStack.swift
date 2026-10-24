@@ -40,7 +40,7 @@ extension StructuredText {
     @Environment(\.listItemSpacingEnabled) private var listItemSpacingEnabled
     @Environment(\.resolvedListItemSpacing) private var resolvedListItemSpacing
 
-    @State private var blockSpacing = BlockSpacing()
+    @State private var blockSpacing: BlockSpacing?
 
     private let content: Content
 
@@ -55,8 +55,14 @@ extension StructuredText {
           // Override with the resolved list item spacing if enabled
           blockSpacing = listItemSpacingEnabled ? resolvedListItemSpacing : value
         }
-        .layoutValue(key: BlockSpacingKey.self, value: blockSpacing)
+        .layoutValue(key: BlockSpacingKey.self, value: blockSpacing ?? BlockSpacing())
+        .layoutValue(key: BlockSpacingPendingKey.self, value: blockSpacing == nil)
     }
+  }
+
+  // True until the block's spacing preference arrives.
+  fileprivate struct BlockSpacingPendingKey: LayoutValueKey {
+    static let defaultValue = false
   }
 
   fileprivate struct BlockVStackLayout: Layout {
@@ -73,10 +79,14 @@ extension StructuredText {
           let next = subviews[index + 1]
           let currentBottom = current[BlockSpacingKey.self].bottom
           let nextTop = next[BlockSpacingKey.self].top
+          let blockSpacing = [currentBottom, nextTop].compactMap(\.self).max()
+
+          if current[BlockSpacingPendingKey.self] || next[BlockSpacingPendingKey.self] {
+            return blockSpacing ?? 0
+          }
 
           // Take the maximum block spacing, otherwise the preferred view spacing
-          return [currentBottom, nextTop].compactMap(\.self).max()
-            ?? current.spacing.distance(to: next.spacing, along: .vertical)
+          return blockSpacing ?? current.spacing.distance(to: next.spacing, along: .vertical)
         }
       )
     }
