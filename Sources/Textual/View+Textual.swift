@@ -185,6 +185,15 @@ extension TextualNamespace where Base: View {
     base.environment(\.inlineStyle, style)
   }
 
+  /// Sets how ``InlineText`` and ``StructuredText`` render soft breaks.
+  ///
+  /// Use ``SoftBreakMode/lineBreak`` to render a single newline inside a paragraph as a line
+  /// break, instead of a space.
+  @inlinable
+  public func softBreakMode(_ softBreakMode: SoftBreakMode) -> some View {
+    base.environment(\.softBreakMode, softBreakMode)
+  }
+
   /// Sets the paragraph style used by ``StructuredText``.
   @inlinable
   public func paragraphStyle(_ paragraphStyle: some StructuredText.ParagraphStyle) -> some View {

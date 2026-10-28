@@ -10,13 +10,16 @@ import SwiftUI
 // - `inlinePresentationIntent` identifies spans like code, emphasis, strong, and strikethrough.
 // - `link` identifies URLs.
 //
-// The view reads `InlineStyle` and `TextEnvironmentValues` from the environment, then produces a
-// styled copy of the attributed string by merging attributes into each matching span.
+// The view reads `InlineStyle`, `SoftBreakMode` and `TextEnvironmentValues` from the environment,
+// then produces a styled copy of the attributed string by merging attributes into each matching
+// span. With `SoftBreakMode.lineBreak`, each soft break becomes a line break first.
 //
-// Styling is recomputed whenever the input, style, or environment snapshot changes.
+// Styling is recomputed whenever the input, style, soft break mode, or environment snapshot
+// changes.
 
 struct WithInlineStyle<Content: View>: View {
   @Environment(\.inlineStyle) private var style
+  @Environment(\.softBreakMode) private var softBreakMode
   @Environment(\.textEnvironment) private var environment
 
   @State private var output: AttributedString?
@@ -34,11 +37,12 @@ struct WithInlineStyle<Content: View>: View {
 
   var body: some View {
     content(output ?? AttributedString())
-      .onChange(of: Tuple(input, style, environment), initial: true) { _, newValue in
+      .onChange(of: Tuple(input, style, softBreakMode, environment), initial: true) { _, newValue in
         resolve(
           attributedString: newValue.values.0,
           style: newValue.values.1,
-          in: newValue.values.2
+          softBreakMode: newValue.values.2,
+          in: newValue.values.3
         )
       }
   }
@@ -46,8 +50,10 @@ struct WithInlineStyle<Content: View>: View {
   private func resolve(
     attributedString: AttributedString,
     style: InlineStyle,
+    softBreakMode: SoftBreakMode,
     in environment: TextEnvironmentValues
   ) {
+    let attributedString = attributedString.replacingSoftBreaks(with: softBreakMode)
     var output = attributedString
 
     for run in attributedString.runs {

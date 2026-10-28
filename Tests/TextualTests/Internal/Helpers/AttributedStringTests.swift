@@ -15,4 +15,15 @@ struct AttributedStringTests {
     #expect(AttributedString("123 Test").slugified() == "123-test")
     #expect(AttributedString("").slugified() == "")
   }
+
+  @Test func replacingSoftBreaks() throws {
+    let markdown = try AttributedString(markdown: "Soft\n**break** and hard  \nbreak")
+
+    let lineBreak = markdown.replacingSoftBreaks(with: .lineBreak)
+    let breaks = lineBreak.runs.filter { lineBreak[$0.range].characters.contains("\n") }
+
+    #expect(markdown.replacingSoftBreaks(with: .space) == markdown)
+    #expect(String(lineBreak.characters) == "Soft\nbreak and hard\nbreak")
+    #expect(breaks.map { $0.inlinePresentationIntent } == [.lineBreak, .lineBreak])
+  }
 }

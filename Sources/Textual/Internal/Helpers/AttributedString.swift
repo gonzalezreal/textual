@@ -50,6 +50,36 @@ extension AttributedStringProtocol {
   }
 }
 
+extension AttributedString {
+  /// Returns a copy that renders soft breaks in the given mode.
+  ///
+  /// With ``SoftBreakMode/lineBreak``, each soft break becomes a newline with a `.lineBreak`
+  /// intent, the same as a hard break.
+  func replacingSoftBreaks(with softBreakMode: SoftBreakMode) -> AttributedString {
+    guard softBreakMode == .lineBreak else {
+      return self
+    }
+
+    var output = AttributedString()
+
+    for run in runs {
+      guard var intent = run.inlinePresentationIntent, intent.contains(.softBreak) else {
+        output.append(self[run.range])
+        continue
+      }
+
+      intent.remove(.softBreak)
+      intent.insert(.lineBreak)
+
+      var lineBreak = AttributedString("\n", attributes: run.attributes)
+      lineBreak.inlinePresentationIntent = intent
+      output.append(lineBreak)
+    }
+
+    return output
+  }
+}
+
 // MARK: - Iterable view into blocks
 //
 // BlockRuns segments an AttributedString into block-level runs based on PresentationIntent
