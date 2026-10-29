@@ -23,12 +23,13 @@ struct TextSelectionInteraction: ViewModifier {
     #if TEXTUAL_ENABLE_TEXT_SELECTION
       if textSelection.allowsSelection {
         content
+          // Handed over while the overlay draws, not from `onChange`: SwiftUI drops a change
+          // action's later runs in the same frame, so a text that reparses or moves as it
+          // appears kept an earlier, empty layout, and a click on a link there landed on nothing.
           .overlayTextLayoutCollection { layoutCollection in
+            let _ = model.setCoordinator(coordinator)
+            let _ = model.setLayoutCollection(layoutCollection)
             Color.clear
-              .onChange(of: AnyTextLayoutCollection(layoutCollection), initial: true) {
-                model.setCoordinator(coordinator)
-                model.setLayoutCollection(layoutCollection)
-              }
           }
           .modifier(PlatformTextSelectionInteraction(model: model))
       } else {

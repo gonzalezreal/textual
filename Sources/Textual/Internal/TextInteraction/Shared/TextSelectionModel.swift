@@ -11,7 +11,7 @@
   // changes, the model attempts to reconcile the current selection into the new layout so the
   // selection stays stable across updates.
 
-  @Observable
+  @MainActor @Observable
   final class TextSelectionModel {
     var selectedRange: TextRange? {
       willSet {
@@ -60,11 +60,12 @@
         return
       }
 
-      // Try to reconcile the selected text range
-      self.selectedRange = layoutCollection.reconcileRange(
-        selectedRange,
-        from: oldLayoutCollection
-      )
+      // This runs while a view draws, so the observed selection is set after the update.
+      let reconciled = layoutCollection.reconcileRange(selectedRange, from: oldLayoutCollection)
+      Task { @MainActor [weak self] in
+        guard let self, self.selectedRange == selectedRange else { return }
+        self.selectedRange = reconciled
+      }
     }
 
     func setCoordinator(_ coordinator: TextSelectionCoordinator?) {

@@ -5,6 +5,7 @@
 
   @testable import Textual
 
+  @MainActor
   struct TextSelectionModelTests {
     @Test
     func urlForPoint() throws {

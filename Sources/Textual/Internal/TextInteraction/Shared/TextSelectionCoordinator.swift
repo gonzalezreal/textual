@@ -13,7 +13,7 @@ import SwiftUI
 // local and non-scrollable regions.
 
 #if TEXTUAL_ENABLE_TEXT_SELECTION
-  @Observable
+  @MainActor @Observable
   final class TextSelectionCoordinator {
     private var models: [WeakBox<TextSelectionModel>] = []
 
