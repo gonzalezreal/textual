@@ -1,5 +1,8 @@
 import SwiftUI
 import Textual
+#if canImport(UIKit)
+  import UIKit
+#endif
 
 struct AttachmentLoaderDemo: View {
   var body: some View {
@@ -12,11 +15,18 @@ struct AttachmentLoaderDemo: View {
 
             ![](400/250)
             ![](300/125)
-            """
+            """,
+          baseURL: URL(string: "https://picsum.photos/seed/textual/")
         )
         .textual.imageAttachmentLoader(
           .image(relativeTo: URL(string: "https://picsum.photos/seed/textual"))
         )
+        .textual.textSelection(.enabled)
+        #if canImport(UIKit)
+          .textual.urlContextMenu { url in
+            UIMenu(children: [UIAction(title: String(localized: "Copy URL")) { _ in UIPasteboard.general.url = url }])
+          }
+        #endif
       }
       Section {
         StructuredText(

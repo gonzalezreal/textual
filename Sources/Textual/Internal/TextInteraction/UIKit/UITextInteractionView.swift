@@ -20,6 +20,9 @@
     var model: TextSelectionModel
     var exclusionRects: [CGRect]
     var openURL: OpenURLAction
+    var menuProvider: URLContextMenuProvider? {
+      didSet { updateContextMenuInteraction() }
+    }
 
     weak var inputDelegate: (any UITextInputDelegate)?
 
@@ -27,15 +30,18 @@
 
     private(set) lazy var _tokenizer = UITextInputStringTokenizer(textInput: self)
     private let selectionInteraction: UITextInteraction
+    private lazy var contextMenuInteraction = UIContextMenuInteraction(delegate: self)
 
     init(
       model: TextSelectionModel,
       exclusionRects: [CGRect],
-      openURL: OpenURLAction
+      openURL: OpenURLAction,
+      menuProvider: URLContextMenuProvider? = nil
     ) {
       self.model = model
       self.exclusionRects = exclusionRects
       self.openURL = openURL
+      self.menuProvider = menuProvider
       self.selectionInteraction = UITextInteraction(for: .nonEditable)
 
       super.init(frame: .zero)
@@ -105,6 +111,24 @@
       }
 
       addInteraction(selectionInteraction)
+      updateContextMenuInteraction()
+    }
+
+    private func updateContextMenuInteraction() {
+      if menuProvider != nil {
+        if contextMenuInteraction.view == nil { addInteraction(contextMenuInteraction) }
+      } else if contextMenuInteraction.view != nil {
+        removeInteraction(contextMenuInteraction)
+      }
+    }
+
+    func menu(at point: CGPoint) -> (URL, UIMenu)? {
+      // Selection handles retain their gestures even when they overlap a URL.
+      guard model.selectedRange?.isCollapsed ?? true else { return nil }
+      guard let url = model.previewURL(for: point), let menu = menuProvider?.menu(url) else {
+        return nil
+      }
+      return (url, menu)
     }
 
     @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
@@ -147,8 +171,7 @@
 
   extension UITextInteractionView: UITextInteractionDelegate {
     func interactionShouldBegin(_ interaction: UITextInteraction, at point: CGPoint) -> Bool {
-      logger.debug("interactionShouldBegin(at: \(point.logDescription)) -> true")
-      return true
+      menu(at: point) == nil
     }
 
     func interactionWillBegin(_ interaction: UITextInteraction) {
@@ -158,6 +181,16 @@
 
     func interactionDidEnd(_ interaction: UITextInteraction) {
       logger.debug("interactionDidEnd")
+    }
+  }
+
+  extension UITextInteractionView: UIContextMenuInteractionDelegate {
+    func contextMenuInteraction(
+      _ interaction: UIContextMenuInteraction,
+      configurationForMenuAtLocation location: CGPoint
+    ) -> UIContextMenuConfiguration? {
+      guard let (url, menu) = menu(at: location) else { return nil }
+      return UIContextMenuConfiguration(identifier: url as NSURL, previewProvider: nil) { _ in menu }
     }
   }
 

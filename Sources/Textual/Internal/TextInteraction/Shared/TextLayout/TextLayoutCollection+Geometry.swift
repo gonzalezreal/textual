@@ -3,6 +3,14 @@
 
   extension TextLayoutCollection {
     func url(for point: CGPoint) -> URL? {
+      run(for: point)?.url
+    }
+
+    func previewURL(for point: CGPoint) -> URL? {
+      run(for: point)?.previewURL
+    }
+
+    private func run(for point: CGPoint) -> (any TextRun)? {
       guard let layout = layouts.first(where: { $0.frame.contains(point) }) else {
         return nil
       }
@@ -12,11 +20,9 @@
         y: point.y - layout.origin.y
       )
 
-      let url = layout.runs.first {
+      return layout.runs.first {
         $0.typographicBounds.contains(localPoint)
-      }?.url
-
-      return url
+      }
     }
 
     func firstRect(for range: TextRange) -> CGRect {

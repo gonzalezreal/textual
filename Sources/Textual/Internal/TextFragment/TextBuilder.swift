@@ -92,6 +92,9 @@ extension Text {
       if let link = run.link {
         text = text.customAttribute(LinkAttribute(link))
       }
+      if let image = run.imageURL {
+        text = text.customAttribute(ImageURLAttribute(url: image))
+      }
 
       return text
     }

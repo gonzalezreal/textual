@@ -114,7 +114,7 @@
 
   struct CodableTextRun: Equatable, Codable, TextRun {
     private enum CodingKeys: String, CodingKey {
-      case isRightToLeft, typographicBounds, url
+      case isRightToLeft, typographicBounds, url, imageURL
       case _slices = "slices"
     }
 
@@ -129,6 +129,8 @@
     let isRightToLeft: Bool
     let typographicBounds: CGRect
     let url: URL?
+    var imageURL: URL? = nil
+    var previewURL: URL? { imageURL ?? url }
     let _slices: [CodableTextRunSlice]
   }
 

@@ -80,6 +80,10 @@
       layoutCollection.url(for: point)
     }
 
+    func previewURL(for point: CGPoint) -> URL? {
+      layoutCollection.previewURL(for: point)
+    }
+
     func layoutIndex(of layout: Text.Layout) -> Int? {
       layoutCollection.index(of: layout)
     }

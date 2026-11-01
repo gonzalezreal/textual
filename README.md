@@ -158,6 +158,22 @@ StructuredText(
 Scrollable regions like code blocks handle their own selection contexts. When you select text in a scrollable area,
 any document-level selection clears automatically, and vice versa.
 
+On iOS, `textual.urlContextMenu(_:)` adds a native long-press menu to links and embedded images:
+
+```swift
+import UIKit
+
+StructuredText(markdown: markdown, baseURL: baseURL)
+  .textual.textSelection(.enabled)
+  .textual.urlContextMenu { url in
+    UIMenu(children: [UIAction(title: "Copy URL") { _ in UIPasteboard.general.url = url }])
+  }
+```
+
+Return `nil` to keep ordinary selection for a URL. Plain text keeps its selection gestures.
+For an image wrapped in a link, the menu receives the image URL. A tap still opens the link.
+The menu provider can run while resolving selection, so perform work only in the menu actions.
+
 ### Styling
 
 Textual provides a flexible styling system that lets you customize every aspect of structured text rendering. At the
