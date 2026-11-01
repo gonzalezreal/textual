@@ -131,6 +131,30 @@
       return (url, menu)
     }
 
+    private func preview(at point: CGPoint) -> UITargetedPreview? {
+      guard let window, let bounds = model.previewBounds(for: point), var source = superview else { return nil }
+      // The representable's host is transparent. Its common ancestor with the rendered text
+      // sits inside the clipping container. Capture the content, not the scroll indicators or menu.
+      while let parent = source.superview, !source.clipsToBounds, !parent.clipsToBounds { source = parent }
+      var rect = bounds.intersection(convert(window.bounds, from: window))
+      var ancestor: UIView? = self
+      while let view = ancestor {
+        if view.clipsToBounds { rect = rect.intersection(convert(view.bounds, from: view)) }
+        ancestor = view.superview
+      }
+      guard !rect.isNull, !rect.isEmpty else { return nil }
+      let sourceRect = convert(rect, to: source)
+      guard let snapshot = source.resizableSnapshotView(from: sourceRect,
+        afterScreenUpdates: false, withCapInsets: .zero)
+        ?? source.resizableSnapshotView(from: sourceRect,
+          afterScreenUpdates: true, withCapInsets: .zero) else { return nil }
+      let parameters = UIPreviewParameters()
+      parameters.backgroundColor = .clear
+      parameters.visiblePath = UIBezierPath(rect: snapshot.bounds)
+      return UITargetedPreview(view: snapshot, parameters: parameters,
+        target: UIPreviewTarget(container: self, center: CGPoint(x: rect.midX, y: rect.midY)))
+    }
+
     @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
       let location = gesture.location(in: self)
       guard let url = model.url(for: location) else {
@@ -184,13 +208,45 @@
     }
   }
 
+  private final class URLMenuConfiguration: UIContextMenuConfiguration {
+    var preview: UITargetedPreview?
+    var loadPreview: (() -> UITargetedPreview?)?
+
+    func makePreview() -> UITargetedPreview? {
+      if let loadPreview {
+        preview = loadPreview()
+        self.loadPreview = nil
+      }
+      guard let preview, preview.target.container.window != nil else { return nil }
+      return UITargetedPreview(view: preview.view, parameters: preview.parameters, target: preview.target)
+    }
+  }
+
   extension UITextInteractionView: UIContextMenuInteractionDelegate {
+    func contextMenuInteraction(
+      _ interaction: UIContextMenuInteraction,
+      configuration: UIContextMenuConfiguration,
+      highlightPreviewForItemWithIdentifier identifier: any NSCopying
+    ) -> UITargetedPreview? {
+      (configuration as? URLMenuConfiguration)?.makePreview()
+    }
+
+    func contextMenuInteraction(
+      _ interaction: UIContextMenuInteraction,
+      configuration: UIContextMenuConfiguration,
+      dismissalPreviewForItemWithIdentifier identifier: any NSCopying
+    ) -> UITargetedPreview? {
+      (configuration as? URLMenuConfiguration)?.makePreview()
+    }
+
     func contextMenuInteraction(
       _ interaction: UIContextMenuInteraction,
       configurationForMenuAtLocation location: CGPoint
     ) -> UIContextMenuConfiguration? {
       guard let (url, menu) = menu(at: location) else { return nil }
-      return UIContextMenuConfiguration(identifier: url as NSURL, previewProvider: nil) { _ in menu }
+      let configuration = URLMenuConfiguration(identifier: url as NSURL, previewProvider: nil) { _ in menu }
+      configuration.loadPreview = { [weak self] in self?.preview(at: location) }
+      return configuration
     }
   }
 
