@@ -8,8 +8,16 @@ struct LinkAttribute: TextAttribute {
   }
 }
 
+struct ImageURLAttribute: TextAttribute {
+  var url: URL
+}
+
 extension Text.Layout.Run {
   var url: URL? {
     self[LinkAttribute.self]?.url
+  }
+
+  var previewURL: URL? {
+    self[ImageURLAttribute.self]?.url ?? url
   }
 }

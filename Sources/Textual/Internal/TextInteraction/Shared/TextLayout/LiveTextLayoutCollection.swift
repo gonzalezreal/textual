@@ -147,6 +147,10 @@
       base.url
     }
 
+    var previewURL: URL? {
+      base.previewURL
+    }
+
     private(set) lazy var slices: [any TextRunSlice] = makeRunSlices()
 
     let base: Text.Layout.Run

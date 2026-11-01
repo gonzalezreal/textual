@@ -7,6 +7,42 @@
 
   struct TextSelectionModelTests {
     @Test
+    func imagePreviewDoesNotChangeOrdinaryLinkTaps() throws {
+      let image = try #require(URL(string: "app-file://host/maps/01%20Airport.png"))
+      let destination = try #require(URL(string: "https://example.com"))
+      let bounds = CGRect(x: 0, y: 0, width: 100, height: 80)
+      for (imageURL, link) in [(nil, destination), (image, nil), (image, destination)] {
+        let run = CodableTextRun(isRightToLeft: false, typographicBounds: bounds,
+                                 url: link, imageURL: imageURL, _slices: [])
+        let line = CodableTextLine(origin: .zero, typographicBounds: bounds, _runs: [run])
+        let layout = CodableTextLayout(attributedString: NSAttributedString(string: "image"),
+                                      origin: CGPoint(x: 20, y: 10), bounds: bounds, _lines: [line])
+        let model = TextSelectionModel(layoutCollection: CodableTextLayoutCollection(_layouts: [layout]))
+        #expect(model.previewURL(for: CGPoint(x: 50, y: 40)) == (imageURL ?? link))
+        #expect(model.previewBounds(for: CGPoint(x: 50, y: 40)) == bounds.offsetBy(dx: 20, dy: 10))
+        #expect(model.url(for: CGPoint(x: 50, y: 40)) == link)
+        #expect(model.previewURL(for: CGPoint(x: 125, y: 40)) == nil)
+        #expect(model.previewBounds(for: CGPoint(x: 125, y: 40)) == nil)
+      }
+    }
+
+    @Test func repeatedURLsHaveSeparatePreviewBounds() throws {
+      let url = try #require(URL(string: "file:///map.png"))
+      let bounds = [CGRect(x: 0, y: 0, width: 200, height: 80),
+                    CGRect(x: 30, y: 100, width: 100, height: 40)]
+      let runs = bounds.map { CodableTextRun(isRightToLeft: false, typographicBounds: $0,
+                                             url: url, _slices: []) }
+      let line = CodableTextLine(origin: .zero, typographicBounds: bounds[0].union(bounds[1]), _runs: runs)
+      let layout = CodableTextLayout(attributedString: NSAttributedString(string: "map map"),
+                                    origin: CGPoint(x: 20, y: 10), bounds: line.typographicBounds, _lines: [line])
+      let model = TextSelectionModel(layoutCollection: CodableTextLayoutCollection(_layouts: [layout]))
+      for bounds in bounds {
+        let rect = bounds.offsetBy(dx: 20, dy: 10)
+        #expect(model.previewBounds(for: CGPoint(x: rect.midX, y: rect.midY)) == rect)
+      }
+    }
+
+    @Test
     func urlForPoint() throws {
       // given
       let model = try TextSelectionModel(fixtureName: "two-paragraphs-bidi")

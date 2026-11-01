@@ -64,7 +64,12 @@
     var layoutDirection: LayoutDirection { get }
     var typographicBounds: CGRect { get }
     var url: URL? { get }
+    var previewURL: URL? { get }
     var slices: [any TextRunSlice] { get }
+  }
+
+  extension TextRun {
+    var previewURL: URL? { url }
   }
 
   protocol TextRunSlice {
