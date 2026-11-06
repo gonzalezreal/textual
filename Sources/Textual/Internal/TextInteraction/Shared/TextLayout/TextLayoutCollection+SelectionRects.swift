@@ -14,6 +14,7 @@
   extension TextLayoutCollection {
     func selectionRects(for range: TextRange, layout: Text.Layout) -> [TextSelectionRect] {
       guard
+        contains(range),
         let layoutIndex = self.index(of: layout),
         let clampedRange = self.clampRange(range, layoutIndex: layoutIndex)
       else {
@@ -28,7 +29,7 @@
     }
 
     func selectionRects(for range: TextRange) -> [TextSelectionRect] {
-      guard !range.isCollapsed else { return [] }
+      guard contains(range), !range.isCollapsed else { return [] }
 
       let startX = self.caretRect(for: range.start).minX
       let endX = self.caretRect(for: range.end).minX

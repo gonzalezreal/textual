@@ -20,6 +20,8 @@
     }
 
     func firstRect(for range: TextRange) -> CGRect {
+      guard contains(range) else { return .null }
+
       guard !range.isCollapsed else {
         return caretRect(for: range.start)
       }
@@ -39,6 +41,8 @@
     }
 
     func caretRect(for position: TextPosition) -> CGRect {
+      guard contains(position) else { return .zero }
+
       let runSliceRect = runSliceRect(at: position.indexPath)
       let lineRect = lineRect(at: position.indexPath)
       let layoutDirection = layoutDirection(at: position.indexPath)
@@ -65,8 +69,10 @@
 
       let lineIndex = layout.lineIndex(closestToY: localPoint.y)
       let line = layout.lines[lineIndex]
+      guard !line.runs.isEmpty else { return nil }
       let runIndex = line.runIndex(closestToX: localPoint.x)
       let run = line.runs[runIndex]
+      guard !run.slices.isEmpty else { return nil }
       let direction = run.layoutDirection
 
       let runSliceIndex = run.sliceIndex(closestToX: localPoint.x)
@@ -105,8 +111,10 @@
 
       let lineIndex = layout.lineIndex(closestToY: localPoint.y)
       let line = layout.lines[lineIndex]
+      guard !line.runs.isEmpty else { return nil }
       let runIndex = line.runIndex(closestToX: localPoint.x)
       let run = line.runs[runIndex]
+      guard !run.slices.isEmpty else { return nil }
       let runSliceIndex = run.sliceIndex(closestToX: localPoint.x)
 
       let start = TextPosition(
@@ -164,6 +172,8 @@
     }
 
     func positionAbove(_ position: TextPosition, anchor: TextPosition) -> TextPosition? {
+      guard contains(position), contains(anchor) else { return nil }
+
       let anchorX = runSliceRect(at: anchor.indexPath).midX
 
       if position.indexPath.line > 0 {
@@ -188,6 +198,8 @@
     }
 
     func positionBelow(_ position: TextPosition, anchor: TextPosition) -> TextPosition? {
+      guard contains(position), contains(anchor) else { return nil }
+
       let anchorX = runSliceRect(at: anchor.indexPath).midX
       let layout = layouts[position.indexPath.layout]
 
@@ -229,10 +241,14 @@
       layoutIndex: Int,
       lineIndex: Int
     ) -> TextPosition? {
+      guard layouts.indices.contains(layoutIndex) else { return nil }
       let layout = layouts[layoutIndex]
+      guard layout.lines.indices.contains(lineIndex) else { return nil }
       let line = layout.lines[lineIndex]
+      guard !line.runs.isEmpty else { return nil }
       let runIndex = line.runIndex(closestToX: x)
       let run = line.runs[runIndex]
+      guard !run.slices.isEmpty else { return nil }
       let direction = run.layoutDirection
 
       let runSliceIndex = run.sliceIndex(closestToX: x)
