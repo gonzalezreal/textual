@@ -111,7 +111,13 @@
     }
 
     func offset(from: TextPosition, to: TextPosition) -> Int {
-      layoutCollection.characterIndex(at: to) - layoutCollection.characterIndex(at: from)
+      guard
+        let fromIndex = layoutCollection.characterIndex(at: from),
+        let toIndex = layoutCollection.characterIndex(at: to)
+      else {
+        return 0
+      }
+      return toIndex - fromIndex
     }
 
     func firstRect(for range: TextRange) -> CGRect {
@@ -135,7 +141,9 @@
     }
 
     func closestPosition(to point: CGPoint, within range: TextRange) -> TextPosition? {
-      guard let position = closestPosition(to: point) else { return nil }
+      guard layoutCollection.contains(range),
+        let position = closestPosition(to: point)
+      else { return nil }
       if position <= range.start { return range.start }
       if position >= range.end { return range.end }
       return position

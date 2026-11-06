@@ -29,7 +29,9 @@
     }
 
     func position(from position: TextPosition, offset: Int) -> TextPosition? {
-      let from = characterIndex(at: position)
+      guard let from = characterIndex(at: position) else {
+        return nil
+      }
       let target = from + offset
 
       guard (0...stringLength).contains(target) else {
@@ -59,11 +61,40 @@
       return self.position(at: layout, localCharacterIndex: localTarget)
     }
 
-    func characterIndex(at position: TextPosition) -> Int {
+    func characterIndex(at position: TextPosition) -> Int? {
+      guard contains(position) else {
+        return nil
+      }
       let base = layouts.prefix(position.indexPath.layout)
         .map(\.attributedString.length)
         .reduce(0, +)
       return base + localCharacterIndex(at: position)
+    }
+
+    func contains(_ position: TextPosition) -> Bool {
+      let indexPath = position.indexPath
+      guard
+        indexPath.count == 4,
+        layouts.indices.contains(indexPath.layout)
+      else {
+        return false
+      }
+
+      let layout = layouts[indexPath.layout]
+      guard layout.lines.indices.contains(indexPath.line) else {
+        return false
+      }
+
+      let line = layout.lines[indexPath.line]
+      guard line.runs.indices.contains(indexPath.run) else {
+        return false
+      }
+
+      return line.runs[indexPath.run].slices.indices.contains(indexPath.runSlice)
+    }
+
+    func contains(_ range: TextRange) -> Bool {
+      contains(range.start) && contains(range.end)
     }
 
     func localCharacterIndex(at position: TextPosition) -> Int {
@@ -163,7 +194,7 @@
     @available(iOS, unavailable)
     @available(visionOS, unavailable)
     func nextWord(from position: TextPosition) -> TextPosition? {
-      guard layouts.indices.contains(position.indexPath.layout) else {
+      guard contains(position) else {
         return nil
       }
       let layout = layouts[position.indexPath.layout]
@@ -192,7 +223,7 @@
     @available(iOS, unavailable)
     @available(visionOS, unavailable)
     func previousWord(from position: TextPosition) -> TextPosition? {
-      guard layouts.indices.contains(position.indexPath.layout) else {
+      guard contains(position) else {
         return nil
       }
       let layout = layouts[position.indexPath.layout]
@@ -226,7 +257,7 @@
     }
 
     func blockStart(for position: TextPosition) -> TextPosition? {
-      guard layouts.indices.contains(position.indexPath.layout) else {
+      guard contains(position) else {
         return nil
       }
 
@@ -247,7 +278,7 @@
     }
 
     func blockEnd(for position: TextPosition) -> TextPosition? {
-      guard layouts.indices.contains(position.indexPath.layout) else {
+      guard contains(position) else {
         return nil
       }
 
@@ -301,7 +332,10 @@
       _ position: TextPosition,
       from other: any TextLayoutCollection
     ) -> TextPosition? {
-      self.position(
+      guard other.contains(position), layouts.indices.contains(position.indexPath.layout) else {
+        return nil
+      }
+      return self.position(
         at: position.indexPath.layout,
         localCharacterIndex: other.localCharacterIndex(at: position)
       )

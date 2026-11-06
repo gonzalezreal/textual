@@ -6,7 +6,7 @@
     @available(iOS, unavailable)
     @available(visionOS, unavailable)
     func wordRange(for position: TextPosition) -> TextRange? {
-      guard layouts.indices.contains(position.indexPath.layout) else {
+      guard contains(position) else {
         return nil
       }
       let layout = layouts[position.indexPath.layout]
@@ -28,7 +28,7 @@
     }
 
     func blockRange(for position: TextPosition) -> TextRange? {
-      guard layouts.indices.contains(position.indexPath.layout) else {
+      guard contains(position) else {
         return nil
       }
 
