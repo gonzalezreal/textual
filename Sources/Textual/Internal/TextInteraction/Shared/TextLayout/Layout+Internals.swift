@@ -16,15 +16,14 @@
         .map(\.attributedString)
         .removingIdenticalDuplicates()
 
-      // Attachment attributes are replaced by placeholders in the rendering pipeline (see TextFragment)
-      // We need to re-apply them to make them part of the contents during copy operations
+      // SwiftUI resolves inline formatting and replaces attachments during layout.
       let attributedStrings = layoutAttributedStrings.map { input in
         // Get all the lines in the layout that reference the input
         let lines = zip(self, lineFragments)
           .filter { $1.attributedString === input }
           .map(\.0)
 
-        return input.applyingAttachments(in: lines)
+        return input.applyingSemanticAttributes(in: lines)
       }
 
       return .init(
@@ -111,8 +110,9 @@
   }
 
   extension NSAttributedString {
-    fileprivate func applyingAttachments(in lines: [Text.Layout.Line]) -> NSAttributedString {
-      guard lines.containsAttachments else {
+    fileprivate func applyingSemanticAttributes(in lines: [Text.Layout.Line]) -> NSAttributedString
+    {
+      guard lines.containsSemanticAttributes else {
         return self
       }
 
@@ -120,6 +120,20 @@
 
       for line in lines {
         for run in line {
+          if let intent = run[InlinePresentationIntentAttribute.self]?.intent, let ctRun = run.ctRun
+          {
+            let stringRange = CTRunGetStringRange(ctRun)
+            if stringRange.location >= 0, stringRange.length > 0,
+              stringRange.location <= length - stringRange.length
+            {
+              result.addAttribute(
+                .inlinePresentationIntent,
+                value: NSNumber(value: intent.rawValue),
+                range: NSRange(location: stringRange.location, length: stringRange.length)
+              )
+            }
+          }
+
           guard
             let attachment = run.attachment,
             let range = run.characterRanges.first
@@ -139,10 +153,10 @@
   }
 
   extension Array where Element == Text.Layout.Line {
-    fileprivate var containsAttachments: Bool {
+    fileprivate var containsSemanticAttributes: Bool {
       self.contains { line in
         line.contains { run in
-          run.attachment != nil
+          run.attachment != nil || run[InlinePresentationIntentAttribute.self] != nil
         }
       }
     }

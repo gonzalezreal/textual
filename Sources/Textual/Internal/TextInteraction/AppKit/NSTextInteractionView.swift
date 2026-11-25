@@ -275,13 +275,16 @@
     }
 
     @objc private func copy(_ sender: Any?) {
+      copySelection(to: .general)
+    }
+
+    func copySelection(to pasteboard: NSPasteboard) {
       guard let selectedRange = model.selectedRange else {
         return
       }
 
       let attributedText = model.attributedText(in: selectedRange)
 
-      let pasteboard = NSPasteboard.general
       pasteboard.clearContents()
 
       let formatter = Formatter(attributedText)
