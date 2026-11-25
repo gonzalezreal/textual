@@ -155,6 +155,8 @@ StructuredText(
 .textual.textSelection(.enabled)
 ```
 
+On macOS, copying a selection into a rich text editor preserves emphasis, code formatting and table cells.
+
 Scrollable regions like code blocks handle their own selection contexts. When you select text in a scrollable area,
 any document-level selection clears automatically, and vice versa.
 

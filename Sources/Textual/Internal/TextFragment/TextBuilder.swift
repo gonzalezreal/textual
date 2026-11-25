@@ -58,6 +58,12 @@ extension TextFragment {
   }
 }
 
+// SwiftUI consumes inline intents when it resolves the font. Keep the semantics
+// alongside the rendered run so a selection can export them with any inline style.
+struct InlinePresentationIntentAttribute: TextAttribute {
+  let intent: InlinePresentationIntent
+}
+
 extension Text {
   fileprivate init(
     attributedString: some AttributedStringProtocol,
@@ -87,6 +93,12 @@ extension Text {
       } else {
         text = Text(AttributedString(attributedString[run.range]))
       }
+
+      #if TEXTUAL_ENABLE_TEXT_SELECTION
+        if let intent = run.inlinePresentationIntent, !intent.isEmpty {
+          text = text.customAttribute(InlinePresentationIntentAttribute(intent: intent))
+        }
+      #endif
 
       // Add link attribute for TextLinkInteraction
       if let link = run.link {

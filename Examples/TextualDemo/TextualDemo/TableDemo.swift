@@ -13,8 +13,8 @@ struct TableDemo: View {
 
     | Area            | Status        | Notes                              |
     |-----------------|---------------|------------------------------------|
-    | Build           | Passing       | Surprisingly stable                |
-    | Tests           | Mostly green  | One flaky test, as usual           |
+    | Build           | **Passing**   | Surprisingly stable                |
+    | Tests           | Mostly green  | Run `swift test` for details       |
     | Documentation   | In progress   | Started, enthusiasm pending        |
     | Refactor Plan   | Vague         | “We’ll know it when we see it”     |
 
